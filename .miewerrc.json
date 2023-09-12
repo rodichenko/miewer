@@ -1,0 +1,10 @@
+{
+  "theming": {
+    "themes": "./src/themes/index.scss",
+    "expose": [{
+      "value": "#222232",
+      "env": "DARK-BACKGROUND",
+      "variable": "dark-background"
+    }]
+  }
+}

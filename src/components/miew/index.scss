@@ -1,0 +1,19 @@
+.mw-miew {
+  pointer-events: auto;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.mw-miew-message {
+  max-width: 60vw;
+  z-index: 1;
+}
+
+@mixin miew($background, $foreground) {
+  .mw-miew {
+    background: $background;
+    color: $foreground;
+  }
+}

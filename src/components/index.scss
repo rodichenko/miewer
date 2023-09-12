@@ -1,0 +1,60 @@
+@import './layout';
+@import './miewer';
+@import './miew';
+@import './terminal';
+
+body {
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+.mw-full-size {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mw-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin components(
+  $background,
+  $foreground,
+  $foreground-faded,
+  $error,
+  $error-faded,
+  $panel-background,
+  $panel-border,
+  $split-divider,
+  $split-divider-hovered
+) {
+  .mw-text-faded {
+    color: $foreground-faded;
+  }
+
+  .mw-error {
+    color: $error;
+
+    &.mw-text-faded {
+      color: $error-faded;
+    }
+  }
+
+  @include miewer($background, $foreground);
+  @include miew($background, $foreground);
+  @include layout(
+    $panel-background,
+    $foreground,
+    $panel-border,
+    $split-divider,
+    $split-divider-hovered
+  );
+  @include miewer-terminal($panel-background, $foreground, $error);
+}

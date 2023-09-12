@@ -1,0 +1,20 @@
+.mw-container {
+  position: relative;
+  pointer-events: none;
+  z-index: 2;
+  display: grid;
+
+  &.horizontal:not(.mw-grid) {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &.vertical:not(.mw-grid) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &.mw-grid {
+    display: grid;
+  }
+}

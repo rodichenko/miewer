@@ -1,0 +1,29 @@
+$panel-padding: 5px;
+$panel-margin: 1px;
+
+.mw-panel {
+  z-index: 2;
+  position: relative;
+  pointer-events: auto;
+  line-height: 1;
+  margin: $panel-margin;
+
+  &:not(.mw-panel-no-padding) {
+    padding: $panel-padding;
+  }
+}
+
+@mixin panel($background, $foreground, $border) {
+  .mw-panel {
+    color: $foreground;
+    background: $background;
+
+    &.mw-panel-transparent {
+      background: transparent;
+    }
+
+    &.mw-panel-bordered {
+      border: 1px solid $border;
+    }
+  }
+}

@@ -1,0 +1,27 @@
+@import './container';
+@import './panel';
+@import './split-container';
+
+.mw-layout {
+  z-index: 2;
+  position: relative;
+  pointer-events: none;
+}
+
+@mixin layout(
+  $panel-background,
+  $panel-foreground,
+  $border,
+  $split-divider,
+  $split-divider-hovered
+) {
+  @include panel(
+    $background: $panel-background,
+    $foreground: $panel-foreground,
+    $border: $border
+  );
+  @include split-divider(
+    $color: $split-divider,
+    $hover: $split-divider-hovered
+  );
+}

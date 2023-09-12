@@ -1,0 +1,15 @@
+export enum DisplayMode {
+  lines = 'LN',
+  licorice = 'LC',
+  ballsAndSticks = 'BS',
+  vanDerWaals = 'VW',
+  solventAccessibleSurface = 'SA',
+  solventExcludedSurface = 'SE',
+  quickSurface = 'QS',
+  contactSurface = 'CS',
+  trace = 'TR',
+  tube = 'TU',
+  cartoon = 'CA',
+  text = 'TX',
+  volumeDensity = 'VD',
+}

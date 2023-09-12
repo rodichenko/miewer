@@ -1,0 +1,13 @@
+.miewer {
+  pointer-events: auto;
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+}
+
+@mixin miewer($bg, $fg) {
+  .miewer {
+    background: $bg;
+    color: $fg;
+  }
+}

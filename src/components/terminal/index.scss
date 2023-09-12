@@ -1,0 +1,23 @@
+.mw-miewer-terminal-container {
+  position: relative;
+
+  .mw-miewer-terminal,
+  .mw-miewer-terminal-messages {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mw-miewer-terminal-message {
+    max-width: 60%;
+  }
+}
+
+@mixin miewer-terminal($background, $foreground, $error) {
+  .mw-miewer-terminal.terminal {
+    --background: #{$background};
+    --color: #{$foreground};
+    --error-color: #{$error};
+  }
+}

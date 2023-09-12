@@ -1,0 +1,15 @@
+export enum DisplayColor {
+  element = 'EL',
+  residueType = 'RT',
+  sequence = 'SQ',
+  chain = 'CH',
+  secondaryStructure = 'SS',
+  uniform = 'UN',
+  conditional = 'CO',
+  conformation = 'CF',
+  temperature = 'TM',
+  occupancy = 'OC',
+  hydrophobicity = 'HY',
+  molecule = 'MO',
+  carbon = 'CB',
+}

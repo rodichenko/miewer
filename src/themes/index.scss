@@ -1,0 +1,43 @@
+@import '../components';
+@import './global';
+
+@mixin dark-theme {
+  @include components(
+    $background: #222222,
+    $foreground: #cacaca,
+    $foreground-faded: #777777,
+    $error: #d13460,
+    $error-faded: #7a243d,
+    $panel-background: fade-out(#111111, 0.1),
+    $panel-border: #444444,
+    $split-divider: transparent,
+    $split-divider-hovered: #444444
+  );
+}
+
+@mixin light-theme {
+  @include components(
+    $background: #f0f0f0,
+    $foreground: #333333,
+    $foreground-faded: #777777,
+    $error: #d90f45,
+    $error-faded: #ef5c83,
+    $panel-background: fade-out(#fafafa, 0.1),
+    $panel-border: #cccccc,
+    $split-divider: transparent,
+    $split-divider-hovered: #aaaaaa
+  );
+}
+
+body {
+  font-family: $font-family;
+  font-size: $font-size;
+}
+
+.dark-theme {
+  @include dark-theme;
+}
+
+.light-theme {
+  @include light-theme;
+}
