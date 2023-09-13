@@ -1,10 +1,8 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
-import { initializeMiew } from '../../helpers/miew';
+import React, { useLayoutEffect, useRef } from 'react';
 import classNames from 'classnames';
-import { noop } from '../../helpers/rest';
-import { useThemeConfig } from '../../themes/general';
-import type { BasicComponentProps } from '../../types/ui';
-import { useMiewStore } from './context';
+import { initializeMiew } from '../../helpers/miew';
+import type { BasicComponentProps } from '../../@types/ui';
+import { useMiewStore } from '../../stores/miew-store';
 
 function MiewRenderer(props: BasicComponentProps) {
   const { className, style } = props;
@@ -17,29 +15,6 @@ function MiewRenderer(props: BasicComponentProps) {
         setError(reason.message);
       });
   }, [setError, setMiew]);
-  const theme = useThemeConfig();
-  useEffect(() => {
-    if (miew) {
-      miew.set('bg.color', theme.background);
-    }
-  }, [theme, miew]);
-  useEffect(() => {
-    if (miew) {
-      setTimeout(() => {
-        // Miew instance created. We need to initialize it
-        if (!miew.init()) {
-          setError('Error initializing Miew');
-          return noop;
-        }
-        miew.run();
-        miew.setOptions({ load: '1crn' });
-      }, 2000);
-      return () => {
-        miew.term();
-      };
-    }
-    return noop;
-  }, [miew, setError]);
   return (
     <div className={className} style={style}>
       <div ref={ref} className="mw-full-size" />

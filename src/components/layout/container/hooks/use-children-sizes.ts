@@ -3,13 +3,13 @@ import type {
   SetContainerSizes,
   ContainerChildren,
   ContainerSizes,
-} from '../types';
+} from '../../../../@types/miewer/layout';
 import {
   childrenSizesHoldSameKeys,
   childrenSizesSetsEqual,
   getChildrenSizes,
   recoverSizesByKeys,
-} from './utilities';
+} from '../utilities';
 
 export function useChildrenSize(
   children?: ContainerChildren,

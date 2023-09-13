@@ -61,6 +61,8 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
+    "antd": "^5.9.0",
     "classnames": "^2.3.2",
     "immer": "^10.0.2",
     "jquery": "^3.7.1",

@@ -1,11 +1,6 @@
 import { createContext } from 'react';
-import type { ContainerSizes, SetContainerSizes } from '../../types';
+import type { ResizerContext } from '../../../../@types/miewer/layout';
 import { noop } from '../../../../helpers/rest';
-
-export type ResizerContext = {
-  sizes: ContainerSizes;
-  setSizes: SetContainerSizes;
-};
 
 export const resizerContext = createContext<ResizerContext>({
   setSizes: noop,

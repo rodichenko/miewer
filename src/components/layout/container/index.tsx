@@ -1,11 +1,11 @@
 import React, { forwardRef, type ForwardedRef } from 'react';
-import type { ContainerProps } from '../types';
+import type { ContainerProps } from '../../../@types/miewer/layout';
 import {
   getChildSizeConfigGenerator,
   getContainerClassName,
+  mapContainerChild,
 } from './utilities';
-import { useContainerStyle } from './use-container-style';
-import { mapContainerChild } from './map-container-child';
+import { useContainerStyle } from './hooks/use-container-style';
 
 function renderContainer(
   props: ContainerProps,

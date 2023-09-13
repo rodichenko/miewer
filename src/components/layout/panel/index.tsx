@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import type { PanelProps } from './types';
+import type { PanelProps } from '../../../@types/miewer/layout';
 
 function Panel(props: PanelProps) {
   const { className, children, style, bordered, noPadding, transparent } =

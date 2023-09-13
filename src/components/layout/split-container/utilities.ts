@@ -1,7 +1,10 @@
-import type { ContainerSizes } from '../types';
+import type {
+  ContainerSizes,
+  GetDirectionSize,
+  ResizeSession,
+} from '../../../@types/miewer/layout';
 import { normalizeSizes, shallowCopySizes, getSizeInfo } from '../utilities';
 import { getGreatestCommonDivisor } from '../../../helpers/rest';
-import type { GetDirectionSize, ResizeSession } from './types';
 
 function isIndex(o: any): boolean {
   return o !== undefined && !Number.isNaN(Number(o));

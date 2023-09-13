@@ -1,4 +1,5 @@
-import { Children, type Key, type CSSProperties } from 'react';
+import React, { Children, type Key, type CSSProperties } from 'react';
+import classNames from 'classnames';
 import type {
   ContainerChild,
   ContainerChildren,
@@ -7,9 +8,14 @@ import type {
   LayoutSize,
   ContainerProps,
   ContainerDirection,
-} from '../types';
-import { shallowCopySizes, isLayoutSize, parseGridSize } from '../utilities';
-import classNames from 'classnames';
+} from '../../../@types/miewer/layout';
+import type { BasicComponentProps } from '../../../@types/ui';
+import {
+  shallowCopySizes,
+  isLayoutSize,
+  parseGridSize,
+  getFlexStyle,
+} from '../utilities';
 
 export function childrenSizesHoldSameKeys(
   set1: ContainerSizes,
@@ -197,4 +203,39 @@ export function mergeStyles(
     },
     ...rest,
   );
+}
+
+export function mapContainerChild<P extends BasicComponentProps>(
+  child: ContainerChild<P>,
+  props: ContainerProps,
+  size: ContainerChildSize | undefined,
+): ContainerChild<P> {
+  const { grid } = props;
+  const direction = getDirection(props);
+  if (!child) {
+    return null;
+  }
+  if (typeof child === 'boolean') {
+    return child;
+  }
+  const { style, ...rest } = child.props;
+  const modifiedStyle = ((): CSSProperties | undefined => {
+    if (size) {
+      if (grid) {
+        return {
+          ...(style ?? {}),
+          [getGridTemplateProperty(direction)]: getSizeGridIndex(size),
+        };
+      }
+      return {
+        ...(style ?? {}),
+        ...(getFlexStyle(size) ?? {}),
+      };
+    }
+    return style;
+  })();
+  return React.cloneElement(child, {
+    ...(rest as Partial<P>),
+    style: modifiedStyle,
+  });
 }

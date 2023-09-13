@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
 import type { CSSProperties } from 'react';
-import type { ContainerProps, ContainerSizes } from '../types';
+import type {
+  ContainerProps,
+  ContainerSizes,
+} from '../../../../@types/miewer/layout';
 import { useChildrenSize } from './use-children-sizes';
-import { getDirection, getGridStyle, mergeStyles } from './utilities';
+import { getDirection, getGridStyle, mergeStyles } from '../utilities';
 
 export function useContainerStyle(
   props: ContainerProps,

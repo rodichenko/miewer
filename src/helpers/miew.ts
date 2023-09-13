@@ -1,8 +1,7 @@
-import type { Miew, MiewOptions } from 'miew';
-import type { MiewerSettings } from '../types/miewer';
-import type { MiewBackgroundSetting, MiewSettings } from '../types/miew';
-
-const emptySettings: MiewerSettings = {};
+import type { Miew } from 'miew';
+import type { Representation } from '../@types/miew';
+import type { UniformColorer } from '../@types/miew';
+import type { DisplayColor } from '../@types/miew';
 
 export async function initializeMiew(
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -12,50 +11,61 @@ export async function initializeMiew(
     throw new Error('Error initializing miew: container is missing');
   }
   const module = await import('miew');
-  return new module.Miew({
+  const miew = new module.Miew({
     container,
     settings: {
       axes: false,
       fps: false,
     },
   });
+  if (!miew.init()) {
+    throw new Error('Error initializing Miew');
+  }
+  miew.run();
+  return miew;
 }
 
-export function getMiewSettings(miewerSettings?: MiewerSettings): MiewSettings {
-  const { background, ...rest } = miewerSettings ?? emptySettings;
-  const bgSetting: MiewBackgroundSetting | undefined = (() => {
-    if (!background) {
-      return undefined;
-    }
+export function getMiewRepresentations(miew: Miew): Representation[] {
+  const count = miew.repCount(undefined) as number;
+  const representations = [];
+  for (let i = 0; i < count; i += 1) {
+    const { selector, mode, material, colorer } = miew.rep(
+      i,
+      undefined,
+    ) as Representation;
+    representations.push({
+      selector,
+      mode,
+      material,
+      colorer,
+    });
+  }
+  return representations;
+}
 
-    if (typeof background === 'number') {
-      return {
-        color: background,
-        transparent: false,
-      };
-    }
-
-    return {
-      color: background.color,
-      transparent: background.transparent,
-    };
-  })();
-
+export function cloneRepresentation(
+  representation: Representation,
+): Representation {
+  const { name, selector, mode, colorer, material } = representation;
   return {
-    bg: bgSetting,
-    ...rest,
+    name,
+    selector,
+    mode,
+    colorer: Array.isArray(colorer)
+      ? (colorer.slice() as UniformColorer)
+      : colorer,
+    material,
   };
 }
 
-export type MiewOptionsFromUrlCallback = (search: string) => MiewOptions;
+export function getColorerHash(colorer: DisplayColor | UniformColorer): string {
+  if (Array.isArray(colorer)) {
+    return [colorer[0], colorer[1].color].join('/');
+  }
+  return colorer;
+}
 
-export type MiewOptionsInitializer = {
-  fromURL: MiewOptionsFromUrlCallback;
-};
-
-export function getMiewOptionsFromUrl(
-  initializer: MiewOptionsInitializer,
-): MiewOptions {
-  const { search } = document.location;
-  return initializer.fromURL(search);
+export function getRepresentationHash(representation: Representation) {
+  const { selector, mode, colorer, material } = representation;
+  return [selector, mode, getColorerHash(colorer), material].join('|');
 }

@@ -1,15 +1,8 @@
 import type { Miew } from 'miew';
-import type { MiewerTerminalInterface } from './types';
+import type { MiewerTerminalInterface } from '../@types/miewer/terminal';
 import 'jquery.terminal';
 import 'jquery.terminal/css/jquery.terminal.min.css';
 import type EventDispatcher from 'miew/dist/utils/EventDispatcher';
-
-declare type OnMiewResponse = (response: any) => void;
-declare type MiewExec = (
-  command: string,
-  onSuccess: OnMiewResponse,
-  onError: OnMiewResponse,
-) => void;
 
 class MiewerTerminal implements MiewerTerminalInterface {
   private readonly _container: HTMLElement;

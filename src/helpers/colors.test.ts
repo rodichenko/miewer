@@ -1,12 +1,26 @@
-import { hexString, colorValueToString } from './colors';
-import type { MiewerColor } from '../types/base';
+import { hexString, colorValueToString, stringToColorValue } from './colors';
+import type { MiewerColor } from '../@types/base';
 
-const testData: Array<[MiewerColor, number | undefined, string]> = [
-  [0xabcdef, undefined, '#abcdef'],
-  [0x000000, undefined, '#000000'],
-  [0xabcdef, 0, '#abcdef00'],
-  [0xabcdef, 1, '#abcdefff'],
-  [0x000000, 0.5, '#0000007f'],
+const testDataNumberToColor: Array<[MiewerColor, number | undefined, string]> =
+  [
+    [0xabcdef, undefined, '#abcdef'],
+    [0x000000, undefined, '#000000'],
+    [0xabcdef, 0, '#abcdef00'],
+    [0xabcdef, 1, '#abcdefff'],
+    [0x000000, 0.5, '#0000007f'],
+  ];
+
+const testDataColorToNumber: Array<[string, MiewerColor]> = [
+  ['#000', 0x0],
+  ['#999', 0x999999],
+  ['#fff', 0xffffff],
+  ['#abcdef', 0xabcdef],
+  ['#010001', 0x010001],
+  ['rgb(255, 255, 255)', 0xffffff],
+  ['rgb(1000, 1000, 1000)', 0xffffff],
+  ['rgba(255, 255, 255, 0)', 0xffffff],
+  ['unknown', 0x0],
+  ['#ffff', 0x0],
 ];
 
 describe('color helpers', () => {
@@ -22,7 +36,7 @@ describe('color helpers', () => {
 });
 
 describe('number to color string', () => {
-  testData.forEach(([color, alpha, result]) => {
+  testDataNumberToColor.forEach(([color, alpha, result]) => {
     const description = [
       `convert ${color}`,
       alpha === undefined ? false : `with alpha ${alpha}`,
@@ -34,6 +48,17 @@ describe('number to color string', () => {
       expect(colorValueToString(color, alpha)).toMatch(
         new RegExp(`^${result}$`, 'i'),
       );
+    });
+  });
+});
+
+describe('css color to number', () => {
+  testDataColorToNumber.forEach(([color, result]) => {
+    const description = [`convert ${color}`, `to ${result}`]
+      .filter(Boolean)
+      .join(' ');
+    test(description, () => {
+      expect(stringToColorValue(color)).toBe(result);
     });
   });
 });

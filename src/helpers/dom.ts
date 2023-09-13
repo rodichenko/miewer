@@ -1,5 +1,5 @@
-import type { Nullable } from '../types/base';
-import type { EnsureElementOptions } from '../types/ui';
+import type { Nullable } from '../@types/base';
+import type { EnsureElementOptions } from '../@types/ui';
 
 const emptyOptions: Nullable<EnsureElementOptions> = {};
 

@@ -1,23 +1,43 @@
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
+import { ConfigProvider, theme } from 'antd';
+import type { ThemeConfig } from 'antd';
 import MiewRenderer from '../miew';
-import { useThemes } from '../../themes/general';
+import { useThemeConfig, useThemes } from '../../stores/themes-store';
 import SplitContainer from '../layout/split-container';
 import Container from '../layout/container';
 import Panel from '../layout/panel';
 import Terminal from '../terminal';
-import { isTerminalVisible, useSetTerminalVisible } from './panels';
+import {
+  isPresentationsVisible,
+  isTerminalVisible,
+} from '../../stores/miewer-panels-store';
+import Presentations from '../presentations';
+import { colorValueToString } from '../../helpers/colors';
+import { useSynchronizedMiewOptions } from '../../stores/miew-store';
 
 function Miewer() {
   useThemes();
+  useSynchronizedMiewOptions();
+  const themeConfig = useThemeConfig();
   const showTerminal = isTerminalVisible();
-  const setTerminalVisible = useSetTerminalVisible();
-  useEffect(() => {
-    setTimeout(() => {
-      setTerminalVisible(true);
-    }, 2000);
-  }, [setTerminalVisible]);
+  const showPresentations = isPresentationsVisible();
+  const antdTheme: ThemeConfig = useMemo(
+    () => ({
+      algorithm: themeConfig.dark
+        ? [theme.darkAlgorithm]
+        : [theme.defaultAlgorithm],
+      token: {
+        borderRadiusOuter: 0,
+        borderRadius: 0,
+        colorError: colorValueToString(themeConfig.error),
+        fontFamily: themeConfig.fontFamily,
+        fontSize: themeConfig.fontSize,
+      },
+    }),
+    [themeConfig, theme],
+  );
   return (
-    <>
+    <ConfigProvider componentSize="small" theme={antdTheme}>
       <MiewRenderer className="mw-miew" />
       <SplitContainer
         key="root"
@@ -36,11 +56,13 @@ function Miewer() {
             </Panel>
           )}
         </SplitContainer>
-        <Panel key="right" size={300} minSize={300}>
-          Miew panel
-        </Panel>
+        {showPresentations && (
+          <Panel key="right" size={300} minSize={300}>
+            <Presentations />
+          </Panel>
+        )}
       </SplitContainer>
-    </>
+    </ConfigProvider>
   );
 }
 

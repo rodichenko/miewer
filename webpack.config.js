@@ -54,7 +54,15 @@ module.exports = function (env, args) {
           sideEffects: true,
           use: [
             production ? MiniCssExtractPlugin.loader : 'style-loader',
-            { loader: 'css-loader', options: { esModule: false } },
+            {
+              loader: 'css-loader',
+              options: {
+                importLoaders: 1,
+                modules: {
+                  mode: 'icss',
+                },
+              },
+            },
             {
               loader: 'postcss-loader',
               options: {

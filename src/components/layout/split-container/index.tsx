@@ -9,8 +9,8 @@ import type {
   ContainerChildSize,
   ContainerChildProps,
   ContainerProps,
-} from '../types';
-import { useChildrenSize } from '../container/use-children-sizes';
+} from '../../../@types/miewer/layout';
+import { useChildrenSize } from '../container/hooks/use-children-sizes';
 import { resizerContext } from './hooks/resize-context';
 
 export type SplitContainerProps = ContainerProps & {

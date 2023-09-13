@@ -1,5 +1,5 @@
 import type { ReactNode, ReactElement, Key } from 'react';
-import type { BasicComponentProps } from '../../types/ui';
+import type { BasicComponentProps } from '../ui';
 
 export type LayoutSize = string | number;
 
@@ -43,3 +43,37 @@ export type ContainerChildren = ContainerChild | ContainerChild[];
 
 export type ContainerSizes = ContainerChildSize[];
 export type SetContainerSizes = (sizes: ContainerSizes) => void;
+export type PanelProps = CommonLayoutProps & {
+  bordered?: boolean;
+  noPadding?: boolean;
+  transparent?: boolean;
+};
+
+export type ResizerContext = {
+  sizes: ContainerSizes;
+  setSizes: SetContainerSizes;
+};
+
+export type DividerDragStartCallback = (divider: HTMLElement) => boolean;
+export type DividerDragCallback = (divider: HTMLElement, delta: number) => void;
+export type DividerDragFinishCallback = (divider: HTMLElement) => void;
+
+export type DividerCallbacks = {
+  onDragStart: DividerDragStartCallback;
+  onDrag: DividerDragCallback;
+  onDragFinish: DividerDragFinishCallback;
+};
+
+export type ResizeSession = {
+  previousSize: number;
+  previousMinSize: number;
+  previousId: number;
+  nextSize: number;
+  nextMinSize: number;
+  nextId: number;
+  grid: HTMLElement;
+  sizes: ContainerSizes;
+  initialSizes: ContainerSizes;
+};
+
+export type GetDirectionSize = (element: HTMLElement) => number;

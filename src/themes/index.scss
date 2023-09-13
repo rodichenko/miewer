@@ -1,5 +1,13 @@
 @import '../components';
-@import './global';
+
+$font-family: verdana, sans-serif;
+$font-size: 11px;
+$dark-background: #222;
+$dark-foreground: #cacaca;
+$dark-error: #d13460;
+$light-background: #f0f0f0;
+$light-foreground: #333;
+$light-error: #d90f45;
 
 @mixin dark-theme {
   @include components(
@@ -32,6 +40,14 @@
 body {
   font-family: $font-family;
   font-size: $font-size;
+
+  &.dark-theme {
+    color-scheme: dark;
+  }
+
+  &.light-theme {
+    color-scheme: light;
+  }
 }
 
 .dark-theme {
@@ -41,3 +57,16 @@ body {
 .light-theme {
   @include light-theme;
 }
+
+/* stylelint-disable */
+:export {
+  fontFamily: $font-family;
+  fontSize: $font-size;
+  darkBackground: $dark-background;
+  darkForeground: $dark-foreground;
+  darkError: $dark-error;
+  lightBackground: $light-background;
+  lightForeground: $light-foreground;
+  lightError: $light-error;
+}
+/* stylelint-enable */

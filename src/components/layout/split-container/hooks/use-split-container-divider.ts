@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { useLayoutEffect, useRef } from 'react';
 import type { MutableRefObject } from 'react';
-import type { ContainerDirection } from '../../types';
+import type {
+  ContainerDirection,
+  DividerCallbacks,
+} from '../../../../@types/miewer/layout';
 import { noop } from '../../../../helpers/rest';
-import type { DividerCallbacks } from '../types';
 
 declare type Point = {
   x: number;

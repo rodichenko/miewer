@@ -2,6 +2,26 @@ export function noop(): any {
   // Noop
 }
 
+export function asArray<T>(data: T | T[]): T[] {
+  if (data !== undefined && Array.isArray(data)) {
+    return data;
+  }
+  if (data !== undefined) {
+    return [data];
+  }
+  return [];
+}
+
+export function asPlain<T>(data: T | T[]): T | undefined {
+  if (data !== undefined && Array.isArray(data)) {
+    return data[0];
+  }
+  if (data !== undefined) {
+    return data;
+  }
+  return undefined;
+}
+
 export function getGreatestCommonDivisorEuclideanAlgorithm(
   a: number,
   b: number,
@@ -35,4 +55,18 @@ export function getGreatestCommonDivisor(...number: number[]): number {
     getGreatestCommonDivisorEuclideanAlgorithm(a, b),
     ...rest,
   );
+}
+
+export function getObjectsShallowDifferences<T extends Record<string, any>>(
+  original: T,
+  comparing: T,
+): Partial<T> {
+  const differences: Partial<T> = {};
+  const keys: Array<keyof T> = Object.keys({ ...original, ...comparing });
+  for (const key of keys) {
+    if (original[key] !== comparing[key] && comparing[key] !== undefined) {
+      differences[key] = comparing[key];
+    }
+  }
+  return differences;
 }
