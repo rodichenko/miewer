@@ -1,72 +1,10 @@
 import { create } from 'zustand';
-import type { MiewerColor } from '../types/base';
+import type { Theme, ThemesStore } from '../@types/miewer/themes';
+import type { PredefinedTheme } from '../@types/miewer/themes';
+import { getThemeConfig, isSystemTheme } from '../themes/utilities';
+import { darkTheme, defaultTheme, lightTheme, systemTheme } from '../themes';
 import { useEffect } from 'react';
 import { noop } from '../helpers/rest';
-
-export const darkBackground: MiewerColor = 0x222222;
-export const darkForeground: MiewerColor = 0xcacaca;
-export const lightBackground: MiewerColor = 0xf0f0f0;
-export const lightForeground: MiewerColor = 0x333333;
-
-export type Theme = {
-  readonly id: string;
-};
-
-export type PredefinedTheme = Theme & {
-  readonly background: MiewerColor;
-  readonly foreground: MiewerColor;
-};
-
-export type SystemTheme = Theme & {
-  readonly dark: PredefinedTheme;
-  readonly light: PredefinedTheme;
-  readonly system: true;
-};
-
-const darkTheme: PredefinedTheme = {
-  id: 'dark-theme',
-  background: darkBackground,
-  foreground: darkForeground,
-};
-const lightTheme: PredefinedTheme = {
-  id: 'light-theme',
-  background: lightBackground,
-  foreground: lightForeground,
-};
-const systemTheme: SystemTheme = {
-  id: 'system-theme',
-  dark: darkTheme,
-  light: lightTheme,
-  system: true,
-};
-
-const defaultTheme: Theme = systemTheme;
-
-export type ThemesStore = {
-  themes: Theme[];
-  theme: Theme;
-  themeConfig: PredefinedTheme;
-  setTheme: (theme: string | Theme) => void;
-  updateThemeConfig: () => void;
-};
-
-function systemThemeIsDark(): boolean {
-  return (
-    window.matchMedia &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
-  );
-}
-
-function isSystemTheme(theme: Theme): theme is SystemTheme {
-  return theme && 'system' in theme && theme.system === true;
-}
-
-export function getThemeConfig(theme: Theme): PredefinedTheme {
-  if (isSystemTheme(theme)) {
-    return systemThemeIsDark() ? theme.dark : theme.light;
-  }
-  return theme as PredefinedTheme;
-}
 
 export const useThemesStore = create<ThemesStore>((set) => ({
   themes: [darkTheme, lightTheme, systemTheme],

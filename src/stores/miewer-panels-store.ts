@@ -1,10 +1,10 @@
-import { create } from 'zustand';
-import type { MiewerPanelsStore } from './types';
-import { MiewerPanel } from './panels';
 import { useCallback } from 'react';
+import { create } from 'zustand';
+import type { MiewerPanelsStore } from '../@types/miewer/panels';
+import { MiewerPanel } from '../@types/miewer/panels';
 
 export const useMiewerPanelsStore = create<MiewerPanelsStore>((set) => ({
-  panels: new Set<MiewerPanel>([MiewerPanel.presentations]),
+  panels: new Set<MiewerPanel>([MiewerPanel.terminal]),
   setPanelVisible(panel: MiewerPanel, visible?: boolean): void {
     set((store) => ({
       panels: new Set<MiewerPanel>(
@@ -24,6 +24,10 @@ export function isTerminalVisible(): boolean {
   return isMiewerPanelVisible(MiewerPanel.terminal);
 }
 
+export function isPresentationsVisible(): boolean {
+  return isMiewerPanelVisible(MiewerPanel.presentations);
+}
+
 export function useSetTerminalVisible(): (visible?: boolean) => void {
   const setPanelVisible = useMiewerPanelsStore(
     (store) => store.setPanelVisible,
@@ -35,5 +39,3 @@ export function useSetTerminalVisible(): (visible?: boolean) => void {
     [setPanelVisible],
   );
 }
-
-export { MiewerPanel };
