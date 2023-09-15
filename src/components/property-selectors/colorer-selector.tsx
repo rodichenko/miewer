@@ -3,8 +3,8 @@ import {
   displayColors,
   displayColorNames,
   displayColorOptionsManifests,
-} from '../../../@types/miew';
-import type { ColorerSelectorProps } from '../../../@types/components/property-selectors';
+} from '../../@types/miew';
+import type { ColorerSelectorProps } from '../../@types/components/property-selectors';
 import MiewPropertySelector from './miew-property-selector';
 
 function ColorerSelector(props: ColorerSelectorProps) {

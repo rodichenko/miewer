@@ -2,19 +2,29 @@ import React, { useLayoutEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { initializeMiew } from '../../helpers/miew/lazy-initialization';
 import type { BasicComponentProps } from '../../@types/components/common';
-import { useMiewStore } from '../../stores/miew-store';
+import {
+  useMiewStore,
+  useSynchronizedMiewOptions,
+} from '../../stores/miew-store';
+import useInitializationOptions from './use-initialization-options';
 
 function MiewRenderer(props: BasicComponentProps) {
+  useSynchronizedMiewOptions();
   const { className, style } = props;
   const ref = useRef<HTMLDivElement>(null);
   const { miew, error, setMiew, setError } = useMiewStore();
+  const initializationOptions = useInitializationOptions(
+    ref.current ?? undefined,
+  );
   useLayoutEffect(() => {
-    initializeMiew(ref.current)
-      .then(setMiew)
-      .catch((reason: Error) => {
-        setError(reason.message);
-      });
-  }, [setError, setMiew]);
+    if (initializationOptions) {
+      initializeMiew(initializationOptions)
+        .then(setMiew)
+        .catch((reason: Error) => {
+          setError(reason.message);
+        });
+    }
+  }, [setError, setMiew, initializationOptions]);
   return (
     <div className={className} style={style}>
       <div ref={ref} className="mw-full-size" />

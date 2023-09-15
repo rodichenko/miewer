@@ -101,6 +101,7 @@ export type Representation = {
   material?: Material;
 };
 export type MiewOptionsExtended = MiewOptions & {
+  source?: string;
   reps?: Representation[];
   settings?: MiewSettings;
   view?: string;
@@ -109,6 +110,7 @@ export type MiewOptionsExtended = MiewOptions & {
 export type MiewOptionsFromUrlCallback = (
   search: string,
 ) => MiewOptionsExtended;
+export type MiewOptionsToCodeGenerator = () => string;
 export type MiewOptionsInitializer = {
   fromURL: MiewOptionsFromUrlCallback;
 };

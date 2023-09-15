@@ -23,7 +23,7 @@ export default function useSplitContainerDivider(
     if (current) {
       let moving: Point | undefined;
       const onMouseDown = (event: MouseEvent) => {
-        if (onDragStart(current)) {
+        if (event.button === 0 && onDragStart(current)) {
           moving = {
             x: event.clientX,
             y: event.clientY,

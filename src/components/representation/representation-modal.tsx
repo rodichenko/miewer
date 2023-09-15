@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Modal } from 'antd';
-import type { RepresentationFormModalProps } from '../../../@types/components/representations';
-import type { Representation } from '../../../@types/miew';
-import RepresentationForm from '../form';
-import { representationsEqual } from '../../../helpers/miew/representations';
+import type { RepresentationFormModalProps } from '../../@types/components/representations';
+import type { Representation } from '../../@types/miew';
+import RepresentationForm from './representation-form';
+import { representationsEqual } from '../../helpers/miew/representations';
 
 function RepresentationFormModal(props: RepresentationFormModalProps) {
   const {
@@ -47,6 +47,7 @@ function RepresentationFormModal(props: RepresentationFormModalProps) {
       style={style}
       open={visible}
       onCancel={onClose}
+      closeIcon={false}
       footer={
         <div className="mw-row mw-space-between">
           <div>

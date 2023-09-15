@@ -1,9 +1,14 @@
+@use 'sass:color';
 @import './layout';
 @import './miewer';
 @import './miew';
 @import './terminal';
+@import './representation';
 @import './representations';
 @import './shared';
+@import './property-selectors';
+@import './property-option';
+@import './property-options';
 
 body {
   position: relative;
@@ -91,17 +96,40 @@ body {
   overflow: auto;
 }
 
+.mw-list {
+  $offset: 5px;
+
+  .mw-list-item {
+    padding: calc($offset / 2.0) 0;
+
+    &:not(:first-child) {
+      border: none;
+    }
+  }
+}
+
+.mw-with-input-padding {
+  padding: 0 7px;
+}
+
 @mixin components(
   $background,
+  $background-accent,
+  $background-faded,
   $foreground,
   $foreground-faded,
+  $foreground-accent,
   $error,
-  $error-faded,
-  $panel-background,
-  $panel-border,
-  $split-divider,
-  $split-divider-hovered
+  $error-faded
 ) {
+  $panel-background: color.adjust($background-accent, $alpha: -0.1);
+  $panel-border: $background-accent;
+  $split-panel-divider: transparent;
+  $split-panel-divider-hover: color.adjust($foreground, $alpha: -0.75);
+  $header: color.adjust($background-accent, $alpha: -0.1);
+  $header-shadow: color.adjust($background-accent, $alpha: -0.8);
+  $divider: color.adjust($foreground, $alpha: -0.75);
+
   .mw-text-faded {
     color: $foreground-faded;
   }
@@ -114,14 +142,25 @@ body {
     }
   }
 
-  @include miewer($background, $foreground, $panel-background, $panel-border);
+  .mw-list .mw-list-item:nth-child(even) {
+    background-color: color.adjust($background-faded, $alpha: -0.25);
+  }
+
+  .mw-input-as-text {
+    &:not(:focus, :active, :hover), {
+      border-color: transparent;
+      background-color: transparent;
+    }
+  }
+
+  @include miewer($background, $foreground, $header, $header-shadow);
   @include miew($background, $foreground);
   @include layout(
     $panel-background,
     $foreground,
     $panel-border,
-    $split-divider,
-    $split-divider-hovered
+    $split-panel-divider,
+    $split-panel-divider-hover
   );
   @include miewer-terminal($panel-background, $foreground, $error);
 }

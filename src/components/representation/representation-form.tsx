@@ -1,15 +1,15 @@
 import React, { useCallback } from 'react';
 import classNames from 'classnames';
-import type { RepresentationFormProps } from '../../../@types/components/representations';
-import { Input } from '../../shared/miewer-input-hoc';
-import ModeSelector from '../../shared/property-selectors/mode-selector';
-import useChangeRepresentation from '../hooks/use-change-representation';
-import ColorerSelector from '../../shared/property-selectors/colorer-selector';
-import MaterialSelector from '../../shared/property-selectors/material-selector';
-import ModeOptions from '../../shared/property-options/mode-options';
-import ColorerOptions from '../../shared/property-options/colorer-options';
-import MaterialOptions from '../../shared/property-options/material-options';
-import { noop } from '../../../helpers/rest';
+import type { RepresentationFormProps } from '../../@types/components/representations';
+import { Input } from '../shared/antd-overrides';
+import ModeSelector from '../property-selectors/mode-selector';
+import useChangeRepresentation from './hooks/use-change-representation';
+import ColorerSelector from '../property-selectors/colorer-selector';
+import MaterialSelector from '../property-selectors/material-selector';
+import ModeOptions from '../property-options/mode-options';
+import ColorerOptions from '../property-options/colorer-options';
+import MaterialOptions from '../property-options/material-options';
+import { noop } from '../../helpers/rest';
 import { Button } from 'antd';
 
 function RepresentationForm(props: RepresentationFormProps) {
@@ -112,7 +112,7 @@ function RepresentationForm(props: RepresentationFormProps) {
       />
       {onRemove && (
         <div className="mw-row mw-end">
-          <Button type="primary" danger>
+          <Button type="primary" danger onClick={onRemoveCallback}>
             Remove
           </Button>
         </div>

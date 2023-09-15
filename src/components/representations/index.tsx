@@ -2,14 +2,14 @@ import React from 'react';
 import classNames from 'classnames';
 import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import type { BasicComponentProps } from '../../../@types/components/common';
+import type { BasicComponentProps } from '../../@types/components/common';
 import {
   useChangeMiewRepresentation,
   useCreateMiewRepresentation,
   useMiewRepresentations,
   useRemoveMiewRepresentation,
-} from '../../../stores/miew-store';
-import RepresentationItem from './item';
+} from '../../stores/miew-store';
+import RepresentationItem from './list-item';
 
 function RepresentationsList(props: BasicComponentProps) {
   const { className, style } = props;
@@ -27,10 +27,11 @@ function RepresentationsList(props: BasicComponentProps) {
           </Button>
         </div>
       </div>
-      <div className="mw-representations-list">
+      <div className="mw-representations-list mw-list">
         {reps.map((representation, idx) => (
           <RepresentationItem
             key={`rep-${idx}`}
+            className="mw-list-item"
             repIndex={idx}
             representation={representation}
             onRemove={removeRep}

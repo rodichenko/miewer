@@ -1,3 +1,5 @@
+import type { QueryStringEntry } from '../@types/rest';
+
 export function noop(): any {
   // Noop
 }
@@ -123,4 +125,85 @@ export function objectsEquals<T, U>(original: T, comparing: U): boolean {
     return true;
   }
   return (original as any) !== (comparing as any);
+}
+
+export function getQueryStringEntries(search?: string): QueryStringEntry[] {
+  const { search: locationSearch = '' } = document.location;
+  const queryString = search ?? locationSearch;
+  const query = queryString.startsWith('?')
+    ? queryString.slice(1)
+    : queryString;
+  return query
+    .split('&')
+    .map((entryString) => entryString.split('='))
+    .map(([key, ...value]) => ({
+      key: decodeURIComponent(key),
+      value: decodeURIComponent(value.join('=')),
+    }));
+}
+
+function getQueryEntryString(
+  entry: QueryStringEntry,
+  encodeKey: boolean,
+  encodeValue: boolean,
+): string {
+  const key = encodeKey ? encodeURIComponent(entry.key) : entry.key;
+  const value = encodeValue ? encodeURIComponent(entry.value) : entry.value;
+  return `${key}=${value}`;
+}
+
+function entryMatchesEncodeKey(
+  entry: QueryStringEntry,
+  encodeKey: string | RegExp,
+): boolean {
+  if (typeof encodeKey === 'string') {
+    return entry.key === encodeKey;
+  }
+  return encodeKey.test(entry.key);
+}
+
+export function getQueryStringFromEntries(
+  entries: QueryStringEntry[],
+  ...encodeKeys: Array<string | RegExp>
+): string {
+  const query = entries
+    .map((entry) =>
+      getQueryEntryString(
+        entry,
+        false,
+        encodeKeys.some((encodeKey) => entryMatchesEncodeKey(entry, encodeKey)),
+      ),
+    )
+    .join('&');
+  return query.length > 0 ? `?${query}` : '';
+}
+
+const escapeRegExpCharacters = [
+  '.',
+  '-',
+  '+',
+  '*',
+  '?',
+  '^',
+  '$',
+  '(',
+  ')',
+  '[',
+  ']',
+  '{',
+  '}',
+];
+
+export function escapeRegExp(
+  string: string,
+  characters = escapeRegExpCharacters,
+): string {
+  let result = string;
+  characters.forEach((character) => {
+    result = result.replace(
+      new RegExp('\\' + character, 'g'),
+      `\\${character}`,
+    );
+  });
+  return result;
 }

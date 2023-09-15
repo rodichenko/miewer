@@ -1,4 +1,4 @@
-import type { BasicComponentProps } from './common';
+import type { BasicComponentProps, ModalProps } from './common';
 import type { CSSProperties } from 'react';
 import type {
   Representation,
@@ -41,10 +41,7 @@ export type SingleColorOptionProps<
 
 export type RepresentationFormProps = BasicComponentProps & RepresentationProps;
 
-export type RepresentationFormModalProps = RepresentationFormProps & {
-  visible: boolean;
-  onClose: () => void;
-};
+export type RepresentationFormModalProps = ModalProps & RepresentationFormProps;
 
 export type ChangeRepresentationPropertyCallback<T> = (value: T) => void;
 

@@ -5,7 +5,7 @@ import {
   MiewRequestProcessor,
   MiewSourceRequest,
 } from './miew-request';
-import { getObjectsShallowDifferences } from '../rest';
+import { getOptionsDiffIgnoringRepresentationNames } from './preprocess-options';
 
 class MiewProxy {
   private _source: string | undefined;
@@ -26,7 +26,10 @@ class MiewProxy {
       this._processor.registerRequest(new MiewSourceRequest(load));
       this._processor.registerRequest(new MiewOptionsRequest(rest));
     } else {
-      const diff = getObjectsShallowDifferences(this._options, rest);
+      const diff = getOptionsDiffIgnoringRepresentationNames(
+        this._options,
+        rest,
+      );
       this._options = rest;
       this._processor.registerRequest(new MiewOptionsRequest(diff));
     }

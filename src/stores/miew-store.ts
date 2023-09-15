@@ -4,6 +4,7 @@ import { produce } from 'immer';
 import type { Miew } from 'miew';
 import type {
   ChangeRepresentationCallback,
+  MiewOptionsToCodeGenerator,
   MiewStore,
   RemoveRepresentationCallback,
 } from '../@types/miew';
@@ -22,9 +23,13 @@ import {
   getRepresentationHash,
   createDefaultRepresentation,
 } from '../helpers/miew/representations';
-import { cloneOptions } from '../helpers/miew/options';
+import { clonePropertyOptions } from '../helpers/miew/property-options';
 import { noop } from '../helpers/rest';
 import MiewProxy from '../helpers/miew-proxy';
+import {
+  getMiewOptionsFromUrl,
+  appendRepresentationsNamesToUrl,
+} from '../helpers/miew/options';
 
 export const useMiewStore = create<MiewStore>((set) => ({
   miew: undefined,
@@ -46,7 +51,7 @@ export const useMiewStore = create<MiewStore>((set) => ({
   setSource(source: string): void {
     set(
       produce((store: MiewStore) => {
-        store.options.load = source;
+        store.options.source = source;
       }),
     );
   },
@@ -54,7 +59,7 @@ export const useMiewStore = create<MiewStore>((set) => ({
     set(
       produce((store: MiewStore) => {
         const currentSettings = store.options.settings;
-        store.options = cloneOptions(options);
+        store.options = clonePropertyOptions(options);
         if (!store.options.settings) {
           store.options.settings = currentSettings;
         } else if (currentSettings?.bg) {
@@ -169,7 +174,7 @@ export function useCreateMiewRepresentation(): CreateRepresentationCallback {
 /**
  * Uses Miewer theme (sets Miew background color)
  */
-function useSynchronizedThemeOptions() {
+export function useSynchronizeMiewBackgroundWithTheme() {
   const theme = useThemeConfig();
   const { setBackground } = useMiewStore();
   useEffect(() => {
@@ -178,16 +183,16 @@ function useSynchronizedThemeOptions() {
 }
 
 /**
- * Uses options from url
+ * Uses miew options from url
  */
 function useSynchronizedUrlOptions(): void {
   const fromUrl = useMiewStore((state) => state.optionsInitializer?.fromURL);
   const { setOptions } = useMiewStore();
-  const { search } = window.location;
   useEffect(() => {
     if (fromUrl) {
-      const options = cloneOptions(fromUrl(search));
+      const options = getMiewOptionsFromUrl(fromUrl);
       if (options.load) {
+        options.source = options.load;
         setOptions(options);
       } else {
         setOptions({
@@ -196,7 +201,7 @@ function useSynchronizedUrlOptions(): void {
         });
       }
     }
-  }, [fromUrl, search, setOptions]);
+  }, [fromUrl, getMiewOptionsFromUrl, setOptions]);
 }
 
 /**
@@ -204,19 +209,24 @@ function useSynchronizedUrlOptions(): void {
  */
 function useSynchronizedMiewCliOptions() {
   const miew = useMiew();
-  const { changeRepresentations } = useMiewStore();
+  const { changeRepresentations, setSource } = useMiewStore();
   useEffect(() => {
     if (miew) {
+      const onMiewLoading = (event: { source: string }) => {
+        setSource(event.source);
+      };
       const onMiewBuildingDone = () => {
         changeRepresentations(getMiewRepresentations(miew));
       };
+      miew.addEventListener('loading', onMiewLoading);
       miew.addEventListener('buildingDone', onMiewBuildingDone);
       return () => {
+        miew.removeEventListener('loading', onMiewLoading);
         miew.removeEventListener('buildingDone', onMiewBuildingDone);
       };
     }
     return noop;
-  }, [miew]);
+  }, [miew, setSource, changeRepresentations]);
 }
 
 /**
@@ -245,9 +255,9 @@ function useSynchronizedUserOptions() {
   }, [proxy, options]);
 }
 
-export function useSynchronizedMiewOptions(): void {
+export function useSynchronizedMiewOptions(): MiewOptionsExtended {
   // --- Synchronizing global Miewer theme ---
-  useSynchronizedThemeOptions();
+  useSynchronizeMiewBackgroundWithTheme();
   // -----------------------------------------
   // --- Synchronizing events from router  ---
   useSynchronizedUrlOptions();
@@ -260,6 +270,7 @@ export function useSynchronizedMiewOptions(): void {
   // ----- Synchronizing Miewer options ------
   // (changing miew settings via Miewer UI)
   useSynchronizedUserOptions();
+  return useMiewOptions();
 }
 
 export function useDisableMiewHotKeys(): () => void {
@@ -278,4 +289,40 @@ export function useEnableMiewHotKeys(): () => void {
       miew.enableHotKeys(true);
     }
   }, [miew]);
+}
+
+export function useRepresentationNames(): Array<string | undefined> {
+  const options = useMiewOptions();
+  const { reps } = options;
+  const cached = useMemo(
+    () => (reps ?? []).map((rep) => rep.name ?? '').join('\n'),
+    [reps],
+  );
+  return useMemo(
+    () => cached.split('\n').map((o) => (o.length ? o : undefined)),
+    [cached],
+  );
+}
+
+export function useUrlGenerator(): MiewOptionsToCodeGenerator {
+  const miew = useMiew();
+  const names = useRepresentationNames();
+  return useCallback((): string => {
+    if (miew) {
+      return appendRepresentationsNamesToUrl(
+        miew.getURL({ settings: false, view: true, compact: false }),
+        names,
+      );
+    }
+    return '';
+  }, [miew, names, appendRepresentationsNamesToUrl]);
+}
+
+export function useScriptGenerator(): MiewOptionsToCodeGenerator {
+  const miew = useMiew();
+  return useCallback(
+    (): string =>
+      miew?.getScript({ settings: false, view: true, compact: false }) ?? '',
+    [miew],
+  );
 }

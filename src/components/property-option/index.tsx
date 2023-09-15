@@ -7,16 +7,16 @@ import type {
   MiewPropertyOptions,
   MiewPropertyOptionType,
   MiewPropertyType,
-} from '../../../@types/miew';
-import type { PropertyOptionProps } from '../../../@types/components/representations';
-import type { MiewerColor } from '../../../@types/base';
-import { MiewPropertyOptionKind } from '../../../@types/miew';
+} from '../../@types/miew';
+import type { PropertyOptionProps } from '../../@types/components/representations';
+import type { MiewerColor } from '../../@types/base';
+import { MiewPropertyOptionKind } from '../../@types/miew';
 import {
   getPropertyOptionValue,
   setPropertyOptionValue,
-} from '../../../helpers/miew/properties';
-import MiewerColorPicker from '../miewer-color-picker';
-import { Input, InputNumber } from '../miewer-input-hoc';
+} from '../../helpers/miew/properties';
+import MiewerColorPicker from '../shared/miewer-color-picker';
+import { Input, InputNumber } from '../shared/antd-overrides';
 
 function PropertyOption<
   Type extends MiewPropertyType,
@@ -58,7 +58,6 @@ function PropertyOption<
   );
   const onEditNumberOption = useCallback(
     (number: any) => {
-      console.log(number);
       if (!Number.isNaN(Number(number))) {
         onEditOption(Number(number));
       }

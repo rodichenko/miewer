@@ -3,37 +3,47 @@
 $font-family: verdana, sans-serif;
 $font-size: 11px;
 $dark-background: #222;
+$dark-background-accent: #111;
+$dark-background-faded: #2f2f2f;
 $dark-foreground: #cacaca;
+$dark-foreground-faded: #777;
+$dark-foreground-accent: #eee;
 $dark-error: #d13460;
+$dark-error-faded: #7a243d;
+$dark-miew-background: $dark-background;
 $light-background: #f0f0f0;
+$light-background-accent: #fafafa;
+$light-background-faded: #e0e0e0;
 $light-foreground: #333;
+$light-foreground-faded: #777;
+$light-foreground-accent: #111;
 $light-error: #d90f45;
+$light-error-faded: #ef5c83;
+$light-miew-background: $light-background;
 
 @mixin dark-theme {
   @include components(
-    $background: #222222,
-    $foreground: #cacaca,
-    $foreground-faded: #777777,
-    $error: #d13460,
-    $error-faded: #7a243d,
-    $panel-background: fade-out(#111111, 0.1),
-    $panel-border: #444444,
-    $split-divider: transparent,
-    $split-divider-hovered: #444444
+    $background: $dark-background,
+    $background-accent: $dark-background-accent,
+    $background-faded: $dark-background-faded,
+    $foreground: $dark-foreground,
+    $foreground-faded: $dark-foreground-faded,
+    $foreground-accent: $dark-foreground-accent,
+    $error: $dark-error,
+    $error-faded: $dark-error-faded
   );
 }
 
 @mixin light-theme {
   @include components(
-    $background: #f0f0f0,
-    $foreground: #333333,
-    $foreground-faded: #777777,
-    $error: #d90f45,
-    $error-faded: #ef5c83,
-    $panel-background: fade-out(#fafafa, 0.1),
-    $panel-border: #cccccc,
-    $split-divider: transparent,
-    $split-divider-hovered: #aaaaaa
+    $background: $light-background,
+    $background-accent: $light-background-accent,
+    $background-faded: $light-background-faded,
+    $foreground: $light-foreground,
+    $foreground-faded: $light-foreground-faded,
+    $foreground-accent: $light-foreground-accent,
+    $error: $light-error,
+    $error-faded: $light-error-faded
   );
 }
 
@@ -65,7 +75,7 @@ body {
   darkBackground: $dark-background;
   darkForeground: $dark-foreground;
   darkError: $dark-error;
-  lightBackground: $light-background;
+  lightBackground: $light-miew-background;
   lightForeground: $light-foreground;
   lightError: $light-error;
 }

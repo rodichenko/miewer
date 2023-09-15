@@ -1,15 +1,12 @@
 import React, { useMemo } from 'react';
-import type { PropertyOptionProps } from '../../../@types/components/representations';
+import type { PropertyOptionProps } from '../../@types/components/representations';
 import classNames from 'classnames';
-import type {
-  MiewPropertyOptions,
-  MiewPropertyType,
-} from '../../../@types/miew';
-import type { PropertyOptionsProps } from '../../../@types/components/representations';
+import type { MiewPropertyOptions, MiewPropertyType } from '../../@types/miew';
+import type { PropertyOptionsProps } from '../../@types/components/representations';
 import {
   getOptionsForProperty,
   getPropertyManifest,
-} from '../../../helpers/miew/properties';
+} from '../../helpers/miew/properties';
 import PropertyOption from '../property-option';
 
 function PropertyOptions<

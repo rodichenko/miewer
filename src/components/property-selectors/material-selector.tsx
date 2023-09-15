@@ -3,8 +3,8 @@ import {
   displayMaterials,
   displayMaterialNames,
   displayMaterialOptionsManifests,
-} from '../../../@types/miew';
-import type { MaterialSelectorProps } from '../../../@types/components/property-selectors';
+} from '../../@types/miew';
+import type { MaterialSelectorProps } from '../../@types/components/property-selectors';
 import MiewPropertySelector from './miew-property-selector';
 
 function MaterialSelector(props: MaterialSelectorProps) {

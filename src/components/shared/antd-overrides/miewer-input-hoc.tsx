@@ -5,12 +5,11 @@ import type {
   FocusEvent,
   FunctionComponent,
 } from 'react';
-import type { FocusableProps } from '../../@types/components/common';
+import type { FocusableProps } from '../../../@types/components/common';
 import {
   useDisableMiewHotKeys,
   useEnableMiewHotKeys,
-} from '../../stores/miew-store';
-import { Input as AntdInput, InputNumber as AntdInputNumber } from 'antd';
+} from '../../../stores/miew-store';
 
 export function miewerInputHoc<P extends FocusableProps>(
   WrappedComponent: ComponentType<P>,
@@ -43,6 +42,3 @@ export function miewerInputHoc<P extends FocusableProps>(
     );
   };
 }
-
-export const Input = miewerInputHoc(AntdInput);
-export const InputNumber = miewerInputHoc(AntdInputNumber);

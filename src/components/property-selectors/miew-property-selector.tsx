@@ -3,12 +3,12 @@ import type { ReactNode } from 'react';
 import type { MenuProps } from 'antd';
 import { Button, Divider, Dropdown, Select } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
-import type { MiewPropertySelectorProps } from '../../../@types/components/property-selectors';
-import type { MiewProperty, MiewPropertyType } from '../../../@types/miew';
+import type { MiewPropertySelectorProps } from '../../@types/components/property-selectors';
+import type { MiewProperty, MiewPropertyType } from '../../@types/miew';
 import {
   getPropertyValue,
   initializeMiewProperty,
-} from '../../../helpers/miew/properties';
+} from '../../helpers/miew/properties';
 
 const configureKey = '__configure__';
 

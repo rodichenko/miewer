@@ -4,21 +4,18 @@ import type { ThemeConfig } from 'antd';
 import MiewRenderer from '../miew';
 import { useAntdThemes, useThemes } from '../../stores/themes-store';
 import SplitContainer from '../layout/split-container';
-import Container from '../layout/container';
+import Container, { SpaceContainer } from '../layout/container';
 import Panel from '../layout/panel';
 import Terminal from '../terminal';
 import {
   isRepresentationsVisible,
   isTerminalVisible,
 } from '../../stores/miewer-panels-store';
-import RepresentationsList from '../representations/list';
+import RepresentationsList from '../representations';
 import Header from './header';
-import { useSynchronizedMiewOptions } from '../../stores/miew-store';
 
 function Miewer() {
   useThemes();
-  // Todo: move `useSynchronizedMiewOptions` elsewhere
-  useSynchronizedMiewOptions();
   const showTerminal = isTerminalVisible();
   const showRepresentations = isRepresentationsVisible();
   const antdTheme: ThemeConfig = useAntdThemes();
@@ -29,7 +26,7 @@ function Miewer() {
         <Header key="header" />
         <SplitContainer key="body" flex direction="horizontal">
           <SplitContainer direction="vertical" flex>
-            <Container key="space" flex />
+            <SpaceContainer key="space" />
             {showTerminal && (
               <Panel
                 key="terminal"

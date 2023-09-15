@@ -11,20 +11,26 @@
     pointer-events: auto;
 
     .mw-miewer-header-toggle {
-      font-size: larger;
+      display: inline-flex;
+      align-items: center;
+
+      .mw-button-icon {
+        font-size: larger;
+      }
+
       line-height: 1;
     }
   }
 }
 
-@mixin miewer($bg, $fg, $panel, $border) {
+@mixin miewer($bg, $fg, $header, $header-shadow) {
   .miewer {
     background: $bg;
     color: $fg;
 
     .mw-miewer-header {
-      background-color: fade-in($panel, 0.05);
-      box-shadow: 0 0 2px 2px rgb(0 0 0 / 10%);
+      background-color: $header;
+      box-shadow: 0 0 2px 2px $header-shadow;
     }
   }
 }

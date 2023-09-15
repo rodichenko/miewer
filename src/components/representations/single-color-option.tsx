@@ -1,17 +1,14 @@
 import React, { useCallback, useMemo } from 'react';
-import type { SingleColorOptionProps } from '../../../../@types/components/representations';
-import type {
-  MiewPropertyOptions,
-  MiewPropertyType,
-} from '../../../../@types/miew';
+import type { SingleColorOptionProps } from '../../@types/components/representations';
+import type { MiewPropertyOptions, MiewPropertyType } from '../../@types/miew';
 import {
   getColorOptionsForProperty,
   getPropertyManifest,
   getPropertyOptionValue,
   setPropertyOptionValue,
-} from '../../../../helpers/miew/properties';
-import MiewerColorPicker from '../../../shared/miewer-color-picker';
-import type { MiewerColor } from '../../../../@types/base';
+} from '../../helpers/miew/properties';
+import MiewerColorPicker from '../shared/miewer-color-picker';
+import type { MiewerColor } from '../../@types/base';
 
 function SingleColorOption<
   Type extends MiewPropertyType,

@@ -1,20 +1,14 @@
 import type { Miew } from 'miew';
+import type { MiewOptionsExtended } from '../../@types/miew';
 
 export async function initializeMiew(
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  container: HTMLDivElement | null,
+  options: MiewOptionsExtended,
 ): Promise<Miew> | never {
-  if (!container) {
+  if (!options.container) {
     throw new Error('Error initializing miew: container is missing');
   }
   const module = await import('miew');
-  const miew = new module.Miew({
-    container,
-    settings: {
-      axes: false,
-      fps: false,
-    },
-  });
+  const miew = new module.Miew(options);
   if (!miew.init()) {
     throw new Error('Error initializing Miew');
   }

@@ -1,17 +1,18 @@
 import React, { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import type { RepresentationItemProps } from '../../../../@types/components/representations';
+import type { RepresentationItemProps } from '../../@types/components/representations';
 import { Button } from 'antd';
 import { DeleteOutlined, SettingOutlined } from '@ant-design/icons';
-import ModeSelector from '../../../shared/property-selectors/mode-selector';
-import ColorerSelector from '../../../shared/property-selectors/colorer-selector';
-import MaterialSelector from '../../../shared/property-selectors/material-selector';
+import ModeSelector from '../property-selectors/mode-selector';
+import ColorerSelector from '../property-selectors/colorer-selector';
+import MaterialSelector from '../property-selectors/material-selector';
 import SingleColorOption from './single-color-option';
-import type { Representation } from '../../../../@types/miew';
-import { displayColorOptionsManifests } from '../../../../@types/miew';
-import RepresentationFormModal from '../../form-modal';
-import useChangeRepresentation from '../../hooks/use-change-representation';
-import { noop } from '../../../../helpers/rest';
+import type { Representation } from '../../@types/miew';
+import { displayColorOptionsManifests } from '../../@types/miew';
+import { RepresentationFormModal } from '../representation';
+import useChangeRepresentation from '../representation/hooks/use-change-representation';
+import { noop } from '../../helpers/rest';
+import { Input } from '../shared/antd-overrides';
 
 function RepresentationItem(props: RepresentationItemProps) {
   const {
@@ -27,11 +28,13 @@ function RepresentationItem(props: RepresentationItemProps) {
     displayMaterial,
   } = props;
   const disabled = itemDisabled ?? !onEdit;
-  const { changeColorer, changeMaterial, changeMode } = useChangeRepresentation(
-    representation,
-    repIndex,
-    onEdit ?? noop,
-  );
+  const {
+    changeColorer,
+    changeMaterial,
+    changeMode,
+    changeNameEvent,
+    changeSelectorEvent,
+  } = useChangeRepresentation(representation, repIndex, onEdit ?? noop);
   const onRemoveCallback = useCallback(() => {
     if (typeof onRemove === 'function') {
       onRemove(repIndex);
@@ -53,13 +56,20 @@ function RepresentationItem(props: RepresentationItemProps) {
     },
     [onEdit, closeModal],
   );
-  const { colorer, mode, material } = representation;
+  const { name, selector, colorer, mode, material } = representation;
+  const placeholder = selector ? `Alias for "${selector}"` : 'Alias';
   return (
     <div
       className={classNames(className, 'mw-representation-control')}
       style={style}>
       <div className="mw-row">
-        <span>{representation.selector}</span>
+        <Input
+          disabled={disabled}
+          className="mw-control mw-input-as-text"
+          value={name}
+          onChange={changeNameEvent}
+          placeholder={placeholder}
+        />
         <div className="mw-actions">
           {displayColorer && (
             <SingleColorOption
@@ -129,6 +139,16 @@ function RepresentationItem(props: RepresentationItemProps) {
             </>
           )}
         </div>
+      </div>
+      <div className="mw-row">
+        <div className="mw-with-input-padding">Selector:</div>
+        <Input
+          disabled={disabled}
+          className="mw-control mw-input-as-text"
+          value={selector}
+          onChange={changeSelectorEvent}
+          placeholder="Selector"
+        />
       </div>
       <RepresentationFormModal
         repIndex={repIndex}

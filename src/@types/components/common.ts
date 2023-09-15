@@ -1,4 +1,9 @@
-import type { CSSProperties, FocusEventHandler, ReactNode } from 'react';
+import type {
+  CSSProperties,
+  FocusEventHandler,
+  MouseEventHandler,
+  ReactNode,
+} from 'react';
 
 export type BasicComponentProps = {
   className?: string;
@@ -7,6 +12,12 @@ export type BasicComponentProps = {
 
 export type BasicParentComponentProps<C = ReactNode> = BasicComponentProps & {
   children?: C;
+};
+
+export type ModalProps = BasicComponentProps & {
+  title?: string;
+  visible: boolean;
+  onClose: () => void;
 };
 
 export type EnsureElementOptions = {
