@@ -1,4 +1,4 @@
-import type { MiewerColor } from '../base';
+import type { MiewerColor } from './base';
 
 export type Theme = {
   readonly id: string;

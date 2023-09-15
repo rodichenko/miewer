@@ -6,7 +6,7 @@ import type {
   ContainerSizes,
   GetDirectionSize,
   ResizeSession,
-} from '../../../@types/miewer/layout';
+} from '../../../@types/components/layout';
 import useSplitContainerDivider from './hooks/use-split-container-divider';
 import { resizerContext } from './hooks/resize-context';
 import { setGridStyle, getDirection } from '../container/utilities';

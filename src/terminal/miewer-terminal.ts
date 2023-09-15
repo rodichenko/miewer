@@ -1,5 +1,5 @@
 import type { Miew } from 'miew';
-import type { MiewerTerminalInterface } from '../@types/miewer/terminal';
+import type { MiewerTerminalInterface } from '../@types/terminal';
 import 'jquery.terminal';
 import 'jquery.terminal/css/jquery.terminal.min.css';
 import type EventDispatcher from 'miew/dist/utils/EventDispatcher';

@@ -6,6 +6,8 @@ $divider-out: 10px;
     margin: 0;
   }
 
+  overflow: hidden;
+
   .mw-split-container-divider {
     align-self: stretch;
     pointer-events: auto;

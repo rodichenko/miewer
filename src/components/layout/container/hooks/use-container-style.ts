@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import type {
   ContainerProps,
   ContainerSizes,
-} from '../../../../@types/miewer/layout';
+} from '../../../../@types/components/layout';
 import { useChildrenSize } from './use-children-sizes';
 import { getDirection, getGridStyle, mergeStyles } from '../utilities';
 

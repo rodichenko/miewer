@@ -11,12 +11,22 @@ import {
   isPresentationsVisible,
   isTerminalVisible,
 } from '../../stores/miewer-panels-store';
-import Presentations from '../presentations';
+import RepresentationsList from '../representations/list';
 import { colorValueToString } from '../../helpers/colors';
 import { useSynchronizedMiewOptions } from '../../stores/miew-store';
+import type { MapToken, SeedToken } from 'antd/es/theme/interface';
+
+function dropDownDarkAlgorithm(seedToken: SeedToken): MapToken {
+  const mapToken = theme.darkAlgorithm(seedToken);
+  mapToken.colorPrimary = mapToken.colorText;
+  mapToken.colorPrimaryBg = mapToken.colorFillTertiary;
+  mapToken.colorPrimaryBgHover = mapToken.colorFillSecondary;
+  return mapToken;
+}
 
 function Miewer() {
   useThemes();
+  // Todo: move `useSynchronizedMiewOptions` elsewhere
   useSynchronizedMiewOptions();
   const themeConfig = useThemeConfig();
   const showTerminal = isTerminalVisible();
@@ -32,6 +42,18 @@ function Miewer() {
         colorError: colorValueToString(themeConfig.error),
         fontFamily: themeConfig.fontFamily,
         fontSize: themeConfig.fontSize,
+      },
+      components: {
+        Dropdown: {
+          algorithm: themeConfig.dark
+            ? [dropDownDarkAlgorithm]
+            : [theme.defaultAlgorithm],
+        },
+        Select: {
+          algorithm: themeConfig.dark
+            ? [dropDownDarkAlgorithm]
+            : [theme.defaultAlgorithm],
+        },
       },
     }),
     [themeConfig, theme],
@@ -58,7 +80,7 @@ function Miewer() {
         </SplitContainer>
         {showPresentations && (
           <Panel key="right" size={300} minSize={300}>
-            <Presentations />
+            <RepresentationsList className="mw-full-size" />
           </Panel>
         )}
       </SplitContainer>

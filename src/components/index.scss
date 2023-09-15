@@ -2,6 +2,8 @@
 @import './miewer';
 @import './miew';
 @import './terminal';
+@import './representations';
+@import './shared';
 
 body {
   position: relative;
@@ -24,20 +26,69 @@ body {
   justify-content: center;
 }
 
+.mw-row > * {
+  margin: 2px 0;
+}
+
+.mw-actions > *:not(:last-child),
+.mw-row > *:not(:last-child) {
+  margin-right: 2px;
+}
+
 .mw-row {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  margin: 2px 0;
+  margin: 1px;
   padding: 1px;
+  justify-content: flex-start;
 
-  > * {
-    margin: 2px 0;
+  &.mw-end {
+    justify-content: flex-end;
   }
 
-  > *:not(:last-child) {
-    margin-right: 5px;
+  &.mw-space-between {
+    justify-content: space-between;
   }
+
+  &.mw-center {
+    justify-content: center;
+  }
+
+  &.mw-start {
+    justify-content: flex-start;
+  }
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &.mw-title-row {
+    margin: 2px 1px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .mw-actions {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .mw-control {
+    flex: 1;
+  }
+}
+
+.mw-title {
+  font-weight: bold;
+}
+
+.mw-dropdown-overlay {
+  max-height: 70vh;
+  overflow: auto;
 }
 
 @mixin components(

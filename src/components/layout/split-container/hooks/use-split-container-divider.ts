@@ -4,7 +4,7 @@ import type { MutableRefObject } from 'react';
 import type {
   ContainerDirection,
   DividerCallbacks,
-} from '../../../../@types/miewer/layout';
+} from '../../../../@types/components/layout';
 import { noop } from '../../../../helpers/rest';
 
 declare type Point = {

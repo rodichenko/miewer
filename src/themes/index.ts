@@ -1,10 +1,6 @@
 import variables from './index.scss';
 import { stringToColorValue } from '../helpers/colors';
-import type {
-  PredefinedTheme,
-  SystemTheme,
-  Theme,
-} from '../@types/miewer/themes';
+import type { PredefinedTheme, SystemTheme, Theme } from '../@types/themes';
 import { mapFontSize } from './utilities';
 
 const {

@@ -2,22 +2,27 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { create } from 'zustand';
 import { produce } from 'immer';
 import type { Miew } from 'miew';
-import type { MiewStore } from '../@types/miew';
+import type {
+  ChangeRepresentationCallback,
+  MiewStore,
+  RemoveRepresentationCallback,
+} from '../@types/miew';
 import type {
   MiewOptionsInitializer,
   MiewOptionsExtended,
   Representation,
   CreateRepresentationCallback,
-  ModifyRepresentationCallback,
+  AddRepresentationCallback,
 } from '../@types/miew';
 import type { MiewerColor } from '../@types/base';
-import { createDefaultRepresentation } from '../helpers/miewer';
 import { useThemeConfig } from './themes-store';
 import {
   cloneRepresentation,
   getMiewRepresentations,
   getRepresentationHash,
-} from '../helpers/miew';
+  createDefaultRepresentation,
+} from '../helpers/miew/representations';
+import { cloneOptions } from '../helpers/miew/options';
 import { noop } from '../helpers/rest';
 import MiewProxy from '../helpers/miew-proxy';
 
@@ -49,7 +54,7 @@ export const useMiewStore = create<MiewStore>((set) => ({
     set(
       produce((store: MiewStore) => {
         const currentSettings = store.options.settings;
-        store.options = options;
+        store.options = cloneOptions(options);
         if (!store.options.settings) {
           store.options.settings = currentSettings;
         } else if (currentSettings?.bg) {
@@ -78,11 +83,25 @@ export const useMiewStore = create<MiewStore>((set) => ({
       }),
     );
   },
+  changeRepresentation(index: number, representation: Representation): void {
+    set(
+      produce((store: MiewStore) => {
+        if (!store.options.reps) {
+          store.options.reps = [];
+        }
+        if (store.options.reps.length <= index) {
+          store.options.reps.push(representation);
+        } else {
+          store.options.reps[index] = representation;
+        }
+      }),
+    );
+  },
   changeRepresentations(representations: Representation[]): void {
     set(
       produce((store: MiewStore) => {
         const result = representations.map(cloneRepresentation);
-        const current = store.options.reps ?? [];
+        const current = (store.options.reps ?? []).map(cloneRepresentation);
         let changed = current.length !== result.length;
         for (let c = 0; c < Math.max(current.length, result.length); c += 1) {
           if (
@@ -102,12 +121,12 @@ export const useMiewStore = create<MiewStore>((set) => ({
       }),
     );
   },
-  removeRepresentation(representation: Representation): void {
+  removeRepresentation(index: number): void {
     set(
       produce((store: MiewStore) => {
-        store.options.reps = (store.options?.reps ?? []).filter(
-          (r) => r !== representation,
-        );
+        if (store.options.reps) {
+          store.options.reps.splice(index, 1);
+        }
       }),
     );
   },
@@ -121,21 +140,25 @@ function useMiewOptions(): MiewOptionsExtended {
   return useMiewStore().options;
 }
 
-export function useMiewerRepresentations(): Representation[] {
+export function useMiewRepresentations(): Representation[] {
   const { reps } = useMiewOptions();
   return useMemo(() => reps ?? [], [reps]);
 }
 
-export function useAddMiewerRepresentation(): ModifyRepresentationCallback {
+export function useAddMiewRepresentation(): AddRepresentationCallback {
   return useMiewStore((store) => store.addRepresentation);
 }
 
-export function useRemoveMiewerRepresentation(): ModifyRepresentationCallback {
+export function useChangeMiewRepresentation(): ChangeRepresentationCallback {
+  return useMiewStore((store) => store.changeRepresentation);
+}
+
+export function useRemoveMiewRepresentation(): RemoveRepresentationCallback {
   return useMiewStore((store) => store.removeRepresentation);
 }
 
-export function useCreateMiewerRepresentation(): CreateRepresentationCallback {
-  const callback = useAddMiewerRepresentation();
+export function useCreateMiewRepresentation(): CreateRepresentationCallback {
+  const callback = useAddMiewRepresentation();
   return useCallback((): Representation => {
     const newRepresentation = createDefaultRepresentation();
     callback(newRepresentation);
@@ -163,7 +186,7 @@ function useSynchronizedUrlOptions(): void {
   const { search } = window.location;
   useEffect(() => {
     if (fromUrl) {
-      const options = fromUrl(search);
+      const options = cloneOptions(fromUrl(search));
       if (options.load) {
         setOptions(options);
       } else {

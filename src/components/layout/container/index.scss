@@ -3,6 +3,7 @@
   pointer-events: none;
   z-index: 2;
   display: grid;
+  overflow: auto;
 
   &.horizontal:not(.mw-grid) {
     display: flex;

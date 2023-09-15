@@ -7,6 +7,8 @@ $panel-margin: 1px;
   pointer-events: auto;
   line-height: 1;
   margin: $panel-margin;
+  overflow: auto;
+  box-sizing: border-box;
 
   &:not(.mw-panel-no-padding) {
     padding: $panel-padding;

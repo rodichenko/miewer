@@ -70,3 +70,57 @@ export function getObjectsShallowDifferences<T extends Record<string, any>>(
   }
   return differences;
 }
+
+export function arraysEquals<T, U>(original: T[], comparing: U[]): boolean {
+  if (original.length !== comparing.length) {
+    return false;
+  }
+  for (let i = 0; i < original.length; i += 1) {
+    if (!objectsEquals(original[i], comparing[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+export function objectsEquals<T, U>(original: T, comparing: U): boolean {
+  if (!original && !comparing) {
+    return true;
+  }
+  if (!original || !comparing) {
+    return false;
+  }
+  if (typeof original !== typeof comparing) {
+    return false;
+  }
+  if (
+    typeof original === 'string' ||
+    typeof original === 'number' ||
+    typeof original === 'boolean'
+  ) {
+    return (original as any) === (comparing as any);
+  }
+  if (Array.isArray(original) && Array.isArray(comparing)) {
+    return arraysEquals(original, comparing);
+  }
+  if (typeof original === 'object' && typeof comparing === 'object') {
+    const keysA = Object.keys(original);
+    const keysB = Object.keys(comparing);
+    const keys = ([] as string[]).concat(keysA).concat(keysB);
+    for (const key of keys) {
+      if (!(key in original) && key in comparing) {
+        return false;
+      }
+      if (key in original && !(key in comparing)) {
+        return false;
+      }
+      const a = original[key as keyof T];
+      const b = comparing[key as keyof U];
+      if (!objectsEquals(a, b)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return (original as any) !== (comparing as any);
+}

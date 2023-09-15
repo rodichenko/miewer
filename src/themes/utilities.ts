@@ -1,8 +1,4 @@
-import type {
-  PredefinedTheme,
-  SystemTheme,
-  Theme,
-} from '../@types/miewer/themes';
+import type { PredefinedTheme, SystemTheme, Theme } from '../@types/themes';
 
 export function mapFontSize(fs: string | number): number {
   if (typeof fs === 'number') {

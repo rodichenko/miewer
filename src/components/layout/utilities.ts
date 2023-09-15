@@ -4,7 +4,7 @@ import type {
   ContainerSizes,
   LayoutSize,
   LayoutSizeInfo,
-} from '../../@types/miewer/layout';
+} from '../../@types/components/layout';
 
 export function isFixedSize(size?: LayoutSize): boolean {
   return (

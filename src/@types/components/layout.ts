@@ -1,5 +1,5 @@
 import type { ReactNode, ReactElement, Key } from 'react';
-import type { BasicComponentProps } from '../ui';
+import type { BasicParentComponentProps } from './common';
 
 export type LayoutSize = string | number;
 
@@ -21,7 +21,7 @@ export type ContainerChildSize = ContainerChildProps & {
   index: number;
 };
 
-export type CommonLayoutProps<C = ReactNode> = BasicComponentProps<C> &
+export type CommonLayoutProps<C = ReactNode> = BasicParentComponentProps<C> &
   ContainerChildProps;
 
 export type ContainerDirection = 'horizontal' | 'vertical';

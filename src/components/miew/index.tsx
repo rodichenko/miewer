@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import classNames from 'classnames';
-import { initializeMiew } from '../../helpers/miew';
-import type { BasicComponentProps } from '../../@types/ui';
+import { initializeMiew } from '../../helpers/miew/lazy-initialization';
+import type { BasicComponentProps } from '../../@types/components/common';
 import { useMiewStore } from '../../stores/miew-store';
 
 function MiewRenderer(props: BasicComponentProps) {

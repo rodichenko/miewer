@@ -56,3 +56,17 @@ export function stringToColorValue(color: string): MiewerColor {
   }
   return 0x0;
 }
+
+/**
+ * Returns byte value of the alpha channel of the color
+ * @param {string} color - color string in hex format (#AABBCC or #AABBCCDD)
+ */
+export function extractAlphaChannel(color: string): number {
+  if (/^#[0-9a-f]{8}$/i.test(color)) {
+    // Shorthand color notation
+    const getChannel = (index: number) =>
+      color[index + 1].concat(color[index + 1]);
+    return stringToHex(getChannel(3));
+  }
+  return 255;
+}

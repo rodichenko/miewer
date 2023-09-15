@@ -5,11 +5,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import type { BasicComponentProps } from '../../@types/ui';
+import type { BasicComponentProps } from '../../@types/components/common';
 import { useMiew } from '../../stores/miew-store';
 import classNames from 'classnames';
 import { noop } from '../../helpers/rest';
-import type { MiewerTerminalInterface } from '../../@types/miewer/terminal';
+import type { MiewerTerminalInterface } from '../../@types/terminal';
 import { initialize } from '../../terminal/initialize';
 
 function Terminal(props: BasicComponentProps) {

@@ -1,10 +1,39 @@
 import type { MiewerColor } from '../base';
 import type { Miew, MiewOptions } from 'miew';
-import { DisplayColor } from './display-color';
-import { DisplayMode } from './display-mode';
-import { Material } from './material';
+import type {
+  MiewPropertyOptions,
+  MiewPropertyConfig,
+  MiewProperty,
+  MiewPropertyOptionManifest,
+  MiewPropertyOptionNamedManifest,
+  MiewPropertyColorOptionManifest,
+  MiewPropertyOptionsManifest,
+  MiewPropertyOptionType,
+} from './base';
+import { MiewPropertyOptionKind } from './base';
+import type { Colorer } from './display-color';
+import type { Mode } from './display-mode';
+import type { Material } from './display-material';
+import {
+  DisplayColor,
+  displayColorNames,
+  displayColorOptionsManifests,
+  displayColors,
+} from './display-color';
+import {
+  DisplayMode,
+  displayModeNames,
+  displayModesOptionsManifests,
+  displayModes,
+} from './display-mode';
+import {
+  DisplayMaterial,
+  displayMaterialNames,
+  displayMaterialOptionsManifests,
+  displayMaterials,
+} from './display-material';
 
-export { DisplayColor, DisplayMode, Material };
+export { DisplayColor, DisplayMode, DisplayMaterial };
 
 export type MiewBackgroundSetting = {
   color: MiewerColor;
@@ -60,13 +89,16 @@ export type MiewSettings = {
   zooming?: boolean;
   zSprite?: boolean;
 };
-export type UniformColorer = [DisplayColor.uniform, { color: MiewerColor }];
+export type TextModeOptions = {
+  colors: boolean;
+  adjustColor: boolean;
+};
 export type Representation = {
   name?: string | undefined;
-  selector: string;
-  mode: DisplayMode;
-  colorer: DisplayColor | UniformColorer;
-  material: Material;
+  selector?: string;
+  mode?: Mode;
+  colorer?: Colorer;
+  material?: Material;
 };
 export type MiewOptionsExtended = MiewOptions & {
   reps?: Representation[];
@@ -80,9 +112,14 @@ export type MiewOptionsFromUrlCallback = (
 export type MiewOptionsInitializer = {
   fromURL: MiewOptionsFromUrlCallback;
 };
-export type ModifyRepresentationCallback = (
+export type AddRepresentationCallback = (
   representation: Representation,
 ) => void;
+export type ChangeRepresentationCallback = (
+  index: number,
+  representation: Representation,
+) => void;
+export type RemoveRepresentationCallback = (index: number) => void;
 export type ModifyRepresentationsCallback = (
   representations: Representation[],
 ) => void;
@@ -106,9 +143,39 @@ export type MiewStoreActions = {
   setSource: SetMiewSourceCallback;
   setOptions: SetMiewOptionsCallback;
   setBackground: SetMiewBackgroundCallback;
-  addRepresentation: ModifyRepresentationCallback;
+  addRepresentation: AddRepresentationCallback;
+  changeRepresentation: ChangeRepresentationCallback;
   changeRepresentations: ModifyRepresentationsCallback;
-  removeRepresentation: ModifyRepresentationCallback;
+  removeRepresentation: RemoveRepresentationCallback;
 };
 
 export type MiewStore = MiewStoreData & MiewStoreActions;
+
+export type MiewPropertyType = DisplayColor | DisplayMode | DisplayMaterial;
+
+export {
+  displayColors,
+  displayMaterials,
+  displayModes,
+  displayColorNames,
+  displayMaterialNames,
+  displayModeNames,
+  displayColorOptionsManifests,
+  displayMaterialOptionsManifests,
+  displayModesOptionsManifests,
+  MiewPropertyOptionKind,
+};
+
+export type {
+  Colorer,
+  Material,
+  Mode,
+  MiewProperty,
+  MiewPropertyConfig,
+  MiewPropertyOptions,
+  MiewPropertyOptionManifest,
+  MiewPropertyColorOptionManifest,
+  MiewPropertyOptionNamedManifest,
+  MiewPropertyOptionsManifest,
+  MiewPropertyOptionType,
+};

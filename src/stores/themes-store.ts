@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { Theme, ThemesStore } from '../@types/miewer/themes';
-import type { PredefinedTheme } from '../@types/miewer/themes';
+import type { Theme, ThemesStore } from '../@types/themes';
+import type { PredefinedTheme } from '../@types/themes';
 import { getThemeConfig, isSystemTheme } from '../themes/utilities';
 import { darkTheme, defaultTheme, lightTheme, systemTheme } from '../themes';
 import { useEffect } from 'react';

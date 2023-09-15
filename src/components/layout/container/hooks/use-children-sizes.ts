@@ -3,7 +3,7 @@ import type {
   SetContainerSizes,
   ContainerChildren,
   ContainerSizes,
-} from '../../../../@types/miewer/layout';
+} from '../../../../@types/components/layout';
 import {
   childrenSizesHoldSameKeys,
   childrenSizesSetsEqual,

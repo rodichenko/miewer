@@ -2,7 +2,7 @@ import type {
   ContainerSizes,
   GetDirectionSize,
   ResizeSession,
-} from '../../../@types/miewer/layout';
+} from '../../../@types/components/layout';
 import { normalizeSizes, shallowCopySizes, getSizeInfo } from '../utilities';
 import { getGreatestCommonDivisor } from '../../../helpers/rest';
 

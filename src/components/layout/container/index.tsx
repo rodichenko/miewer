@@ -1,5 +1,5 @@
 import React, { forwardRef, type ForwardedRef } from 'react';
-import type { ContainerProps } from '../../../@types/miewer/layout';
+import type { ContainerProps } from '../../../@types/components/layout';
 import {
   getChildSizeConfigGenerator,
   getContainerClassName,

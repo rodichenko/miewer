@@ -9,7 +9,7 @@ import type {
   ContainerChildSize,
   ContainerChildProps,
   ContainerProps,
-} from '../../../@types/miewer/layout';
+} from '../../../@types/components/layout';
 import { useChildrenSize } from '../container/hooks/use-children-sizes';
 import { resizerContext } from './hooks/resize-context';
 

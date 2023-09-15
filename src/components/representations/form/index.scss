@@ -1,0 +1,13 @@
+.mw-representation-form {
+  .mw-representation-row {
+    padding-right: 20px;
+
+    .mw-representation-property {
+      min-width: 75px;
+    }
+
+    &.mw-representation-row-details {
+      padding-left: 80px;
+    }
+  }
+}

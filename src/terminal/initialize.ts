@@ -1,4 +1,4 @@
-import type { MiewerTerminalInterface } from '../@types/miewer/terminal';
+import type { MiewerTerminalInterface } from '../@types/terminal';
 
 export async function initialize(
   terminalDiv: HTMLElement,

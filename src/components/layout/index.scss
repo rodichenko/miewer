@@ -2,12 +2,6 @@
 @import './panel';
 @import './split-container';
 
-.mw-layout {
-  z-index: 2;
-  position: relative;
-  pointer-events: none;
-}
-
 @mixin layout(
   $panel-background,
   $panel-foreground,

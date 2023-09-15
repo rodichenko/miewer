@@ -8,8 +8,8 @@ import type {
   LayoutSize,
   ContainerProps,
   ContainerDirection,
-} from '../../../@types/miewer/layout';
-import type { BasicComponentProps } from '../../../@types/ui';
+} from '../../../@types/components/layout';
+import type { BasicComponentProps } from '../../../@types/components/common';
 import {
   shallowCopySizes,
   isLayoutSize,

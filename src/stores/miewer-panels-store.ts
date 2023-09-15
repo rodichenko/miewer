@@ -1,10 +1,13 @@
 import { useCallback } from 'react';
 import { create } from 'zustand';
-import type { MiewerPanelsStore } from '../@types/miewer/panels';
-import { MiewerPanel } from '../@types/miewer/panels';
+import type { MiewerPanelsStore } from '../@types/components/panels';
+import { MiewerPanel } from '../@types/components/panels';
 
 export const useMiewerPanelsStore = create<MiewerPanelsStore>((set) => ({
-  panels: new Set<MiewerPanel>([MiewerPanel.terminal]),
+  panels: new Set<MiewerPanel>([
+    MiewerPanel.presentations,
+    MiewerPanel.terminal,
+  ]),
   setPanelVisible(panel: MiewerPanel, visible?: boolean): void {
     set((store) => ({
       panels: new Set<MiewerPanel>(

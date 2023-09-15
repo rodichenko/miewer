@@ -1,0 +1,13 @@
+.mw-color-picker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg circle {
+    stroke: currentcolor;
+  }
+}
+
+.mw-color-picker-display-value {
+  min-width: 50px;
+}
