@@ -2,6 +2,7 @@ import type { MiewerColor } from './base';
 
 export type Theme = {
   readonly id: string;
+  readonly title: string;
 };
 
 export type PredefinedTheme = Theme & {

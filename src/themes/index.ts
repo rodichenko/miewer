@@ -16,6 +16,7 @@ const {
 
 export const darkTheme: PredefinedTheme = {
   id: 'dark-theme',
+  title: 'Dark theme',
   background: stringToColorValue(darkBackground),
   foreground: stringToColorValue(darkForeground),
   error: stringToColorValue(darkError),
@@ -25,6 +26,7 @@ export const darkTheme: PredefinedTheme = {
 };
 export const lightTheme: PredefinedTheme = {
   id: 'light-theme',
+  title: 'Light theme',
   background: stringToColorValue(lightBackground),
   foreground: stringToColorValue(lightForeground),
   error: stringToColorValue(lightError),
@@ -34,9 +36,8 @@ export const lightTheme: PredefinedTheme = {
 };
 export const systemTheme: SystemTheme = {
   id: 'system-theme',
+  title: 'System theme',
   dark: darkTheme,
   light: lightTheme,
   system: true,
 };
-
-export const defaultTheme: Theme = systemTheme;

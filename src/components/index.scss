@@ -100,7 +100,7 @@ body {
   $offset: 5px;
 
   .mw-list-item {
-    padding: calc($offset / 2.0) 0;
+    padding: calc($offset / 2) 0;
 
     &:not(:first-child) {
       border: none;
@@ -147,14 +147,14 @@ body {
   }
 
   .mw-input-as-text {
-    &:not(:focus, :active, :hover), {
+    &:not(:focus, :active, :hover) {
       border-color: transparent;
       background-color: transparent;
     }
   }
 
   @include miewer($background, $foreground, $header, $header-shadow);
-  @include miew($background, $foreground);
+  @include miew($background, $foreground, $panel-background, $panel-border);
   @include layout(
     $panel-background,
     $foreground,

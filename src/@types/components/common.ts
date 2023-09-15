@@ -1,9 +1,4 @@
-import type {
-  CSSProperties,
-  FocusEventHandler,
-  MouseEventHandler,
-  ReactNode,
-} from 'react';
+import type { CSSProperties, FocusEventHandler, ReactNode } from 'react';
 
 export type BasicComponentProps = {
   className?: string;

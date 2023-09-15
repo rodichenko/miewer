@@ -13,11 +13,6 @@
     .mw-miewer-header-toggle {
       display: inline-flex;
       align-items: center;
-
-      .mw-button-icon {
-        font-size: larger;
-      }
-
       line-height: 1;
     }
   }
@@ -32,5 +27,20 @@
       background-color: $header;
       box-shadow: 0 0 2px 2px $header-shadow;
     }
+  }
+}
+
+.mw-header-menu-item-icon {
+  font-size: larger;
+}
+
+.mw-header-menu-item-text {
+  display: flex;
+  width: 100%;
+  min-width: 100px;
+  align-items: center;
+
+  > *:not(:last-child) {
+    margin-right: 5px;
   }
 }

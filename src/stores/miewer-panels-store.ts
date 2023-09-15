@@ -33,16 +33,16 @@ export const useMiewerPanelsStore = create<MiewerPanelsStore>((set) => ({
   },
 }));
 
-export function isMiewerPanelVisible(panel: MiewerPanel): boolean {
+export function usePanelVisible(panel: MiewerPanel): boolean {
   return useMiewerPanelsStore((store) => store.panels).has(panel);
 }
 
 export function isTerminalVisible(): boolean {
-  return isMiewerPanelVisible(MiewerPanel.terminal);
+  return usePanelVisible(MiewerPanel.terminal);
 }
 
 export function isRepresentationsVisible(): boolean {
-  return isMiewerPanelVisible(MiewerPanel.representations);
+  return usePanelVisible(MiewerPanel.representations);
 }
 
 export function useTogglePanel(panel: MiewerPanel): () => void {

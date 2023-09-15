@@ -5,13 +5,26 @@ import type { MapToken, SeedToken } from 'antd/es/theme/interface';
 import type { Theme, ThemesStore } from '../@types/themes';
 import type { PredefinedTheme } from '../@types/themes';
 import { getThemeConfig, isSystemTheme } from '../themes/utilities';
-import { darkTheme, defaultTheme, lightTheme, systemTheme } from '../themes';
+import { darkTheme, lightTheme, systemTheme } from '../themes';
 import { useEffect, useMemo } from 'react';
 import { noop } from '../helpers/rest';
 import { colorValueToString } from '../helpers/colors';
 
+function readThemeFromLocalStorage(): string {
+  return localStorage.getItem('miewer-theme') ?? systemTheme.id;
+}
+
+function writeThemeToLocalStorage(id: string) {
+  localStorage.setItem('miewer-theme', id);
+}
+
+const themes = [darkTheme, lightTheme, systemTheme];
+const defaultThemeId: string = readThemeFromLocalStorage();
+const defaultTheme =
+  themes.find((theme) => theme.id === defaultThemeId) ?? systemTheme;
+
 export const useThemesStore = create<ThemesStore>((set) => ({
-  themes: [darkTheme, lightTheme, systemTheme],
+  themes,
   theme: defaultTheme,
   themeConfig: getThemeConfig(defaultTheme),
   setTheme(theme: string | Theme) {
@@ -19,6 +32,7 @@ export const useThemesStore = create<ThemesStore>((set) => ({
       if (typeof theme === 'string') {
         const aTheme = state.themes.find((o) => o.id === theme);
         if (aTheme) {
+          writeThemeToLocalStorage(aTheme.id);
           return {
             theme: aTheme,
             themeConfig: getThemeConfig(aTheme),
