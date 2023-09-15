@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type {
   ContainerChildSize,
+  ContainerDirection,
   ContainerSizes,
   LayoutSize,
   LayoutSizeInfo,
@@ -126,32 +127,29 @@ export function parseGridSize(size?: LayoutSize, minSize?: number): string {
   return max;
 }
 
-export function parseFlexSize(size?: LayoutSize, minSize?: number): string {
-  if (size === undefined) {
-    return 'auto';
-  }
-  if (typeof size === 'number') {
-    return `${size}px`;
-  }
-  const minSizeConfig = minSize ? `${minSize}px` : 'auto';
-  const e = /^(\d+(\.\d+)?)(fr|\*)$/i.exec(size);
-  if (e?.[1]) {
-    const grow = e[1];
-    return `${grow} 1 ${minSizeConfig}`;
-  }
-  return `1 1 ${minSizeConfig}`;
-}
-
 export function getFlexStyle(
-  childSize?: ContainerChildSize,
+  childSize: ContainerChildSize,
+  direction: ContainerDirection,
 ): CSSProperties | undefined {
   if (!childSize) {
     return undefined;
   }
   const { size, minSize } = childSize;
-  return {
-    flex: parseFlexSize(size, minSize),
-  };
+  if (typeof size === 'string') {
+    const e = /^(\d+(\.\d+)?)?(fr|\*)$/i.exec(size);
+    if (e) {
+      const grow = e[1] ?? 1;
+      const minSizeValue = minSize ? `${minSize}px` : 'auto';
+      return { flex: `${grow} 1 ${minSizeValue}` };
+    }
+  }
+  switch (direction) {
+    case 'horizontal':
+      return { width: size, minWidth: minSize };
+    case 'vertical':
+    default:
+      return { height: size, minHeight: minSize };
+  }
 }
 
 export function shallowCopySizes(sizes: ContainerSizes): ContainerSizes {

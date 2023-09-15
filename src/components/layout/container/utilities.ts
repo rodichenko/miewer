@@ -70,11 +70,13 @@ export function createChildSizeConfig(
 ): ContainerChildSize {
   let key: Key | undefined;
   let size: LayoutSize | undefined;
-  let minSizeValue: number = minSize ?? 50;
+  let minSizeValue: number = minSize ?? 5;
   if (typeof child !== 'boolean' && child) {
     key = child.key ?? undefined;
     size = isLayoutSize(child.props.size)
       ? (child.props.size as LayoutSize)
+      : child.props.flex
+      ? '*'
       : undefined;
     minSizeValue =
       typeof child.props.minSize === 'number'
@@ -229,7 +231,7 @@ export function mapContainerChild<P extends BasicComponentProps>(
       }
       return {
         ...(style ?? {}),
-        ...(getFlexStyle(size) ?? {}),
+        ...(getFlexStyle(size, direction) ?? {}),
       };
     }
     return style;

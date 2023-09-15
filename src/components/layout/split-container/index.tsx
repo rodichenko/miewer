@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import type { Key } from 'react';
 import classNames from 'classnames';
 import Container from '../container';
@@ -31,6 +31,17 @@ function getChildSizeProps(child: ContainerChild): ContainerChildProps {
   return {};
 }
 
+function cloneChildElementWithoutProps(child: ContainerChild): ContainerChild {
+  if (child && typeof child !== 'boolean') {
+    return React.cloneElement(child, {
+      size: undefined,
+      minSize: undefined,
+      flex: true,
+    });
+  }
+  return child;
+}
+
 function SplitContainer(props: SplitContainerProps) {
   const { children, className, dividerSize = 1, ...containerProps } = props;
   const splitContainerClassName = classNames(className, 'mw-split-container');
@@ -54,7 +65,7 @@ function SplitContainer(props: SplitContainerProps) {
         }
         mapped.push(
           <Container key={key} {...getChildSizeProps(child as ContainerChild)}>
-            {child as ContainerChild}
+            {cloneChildElementWithoutProps(child)}
           </Container>,
         );
       }

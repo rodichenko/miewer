@@ -21,8 +21,8 @@ function RepresentationsList(props: BasicComponentProps) {
     <div className={classNames(className, 'mw-representations')} style={style}>
       <div className="mw-row mw-title-row">
         <span className="mw-title">Layers</span>
-        <div className="mw-actions">
-          <Button onClick={createRep}>
+        <div className="mw-actions mw-representation-action">
+          <Button type="text" onClick={createRep}>
             <PlusOutlined />
           </Button>
         </div>

@@ -4,10 +4,7 @@ import type { MiewerPanelsStore } from '../@types/components/panels';
 import { MiewerPanel } from '../@types/components/panels';
 
 export const useMiewerPanelsStore = create<MiewerPanelsStore>((set) => ({
-  panels: new Set<MiewerPanel>([
-    MiewerPanel.presentations,
-    MiewerPanel.terminal,
-  ]),
+  panels: new Set<MiewerPanel>([MiewerPanel.representations]),
   setPanelVisible(panel: MiewerPanel, visible?: boolean): void {
     set((store) => ({
       panels: new Set<MiewerPanel>(
@@ -16,6 +13,23 @@ export const useMiewerPanelsStore = create<MiewerPanelsStore>((set) => ({
           .concat(visible === undefined || visible ? [panel] : []),
       ),
     }));
+  },
+  togglePanel(panel: MiewerPanel): void {
+    set((store) => {
+      const visible = store.panels.has(panel);
+      if (visible) {
+        // Hide panel
+        return {
+          panels: new Set<MiewerPanel>(
+            [...store.panels].filter((p) => p !== panel),
+          ),
+        };
+      }
+      // Show panel
+      return {
+        panels: new Set<MiewerPanel>([...store.panels].concat(panel)),
+      };
+    });
   },
 }));
 
@@ -27,18 +41,21 @@ export function isTerminalVisible(): boolean {
   return isMiewerPanelVisible(MiewerPanel.terminal);
 }
 
-export function isPresentationsVisible(): boolean {
-  return isMiewerPanelVisible(MiewerPanel.presentations);
+export function isRepresentationsVisible(): boolean {
+  return isMiewerPanelVisible(MiewerPanel.representations);
 }
 
-export function useSetTerminalVisible(): (visible?: boolean) => void {
-  const setPanelVisible = useMiewerPanelsStore(
-    (store) => store.setPanelVisible,
-  );
-  return useCallback(
-    (visible?: boolean): void => {
-      setPanelVisible(MiewerPanel.terminal, visible);
-    },
-    [setPanelVisible],
-  );
+export function useTogglePanel(panel: MiewerPanel): () => void {
+  const togglePanel = useMiewerPanelsStore((store) => store.togglePanel);
+  return useCallback((): void => {
+    togglePanel(panel);
+  }, [togglePanel, panel]);
+}
+
+export function useToggleTerminal(): () => void {
+  return useTogglePanel(MiewerPanel.terminal);
+}
+
+export function useToggleRepresentations(): () => void {
+  return useTogglePanel(MiewerPanel.representations);
 }

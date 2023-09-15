@@ -114,7 +114,7 @@ body {
     }
   }
 
-  @include miewer($background, $foreground);
+  @include miewer($background, $foreground, $panel-background, $panel-border);
   @include miew($background, $foreground);
   @include layout(
     $panel-background,

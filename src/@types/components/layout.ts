@@ -14,6 +14,7 @@ export type LayoutSizeInfo = {
 export type ContainerChildProps = {
   size?: LayoutSize;
   minSize?: number;
+  flex?: boolean;
 };
 
 export type ContainerChildSize = ContainerChildProps & {
