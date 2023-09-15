@@ -1,26 +1,17 @@
 import React, { useCallback, useMemo } from 'react';
 import type { SingleColorOptionProps } from '../../../../@types/components/representations';
 import type {
-  MiewPropertyOptionManifest,
   MiewPropertyOptions,
   MiewPropertyType,
 } from '../../../../@types/miew';
 import {
   getColorOptionsForProperty,
-  getOptionsForProperty,
   getPropertyManifest,
-  getPropertyOptions,
   getPropertyOptionValue,
   setPropertyOptionValue,
 } from '../../../../helpers/miew/properties';
-import { useSingleItem } from '../../../../helpers/miewer';
 import MiewerColorPicker from '../../../shared/miewer-color-picker';
 import type { MiewerColor } from '../../../../@types/base';
-import { colorValueToString } from '../../../../helpers/colors';
-
-function mainPropertySelector(property: MiewPropertyOptionManifest): boolean {
-  return Boolean(property.main);
-}
 
 function SingleColorOption<
   Type extends MiewPropertyType,
@@ -35,10 +26,7 @@ function SingleColorOption<
     () => (value ? getColorOptionsForProperty(value, manifests) : []),
     [value, manifests],
   );
-  const optionManifest = useSingleItem(
-    propertyOptionsManifests,
-    mainPropertySelector,
-  );
+  const optionManifest = propertyOptionsManifests.find((o) => o.main);
   const color = useMemo(() => {
     if (optionManifest && value) {
       const colorValue =

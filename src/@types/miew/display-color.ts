@@ -29,7 +29,6 @@ export type ElementColorOptions = {
 export const element: MiewPropertyOptionsManifest<ElementColorOptions> = {
   carbon: {
     default: -1,
-    main: true,
     kind: MiewPropertyOptionKind.color,
   },
 };
@@ -61,7 +60,6 @@ export const conditional: MiewPropertyOptionsManifest<ConditionalColorOptions> =
     },
     color: {
       default: 0xff0000,
-      main: true,
       kind: MiewPropertyOptionKind.color,
     },
     baseColor: {
@@ -78,7 +76,6 @@ export type CarbonColorOptions = {
 export const carbon: MiewPropertyOptionsManifest<CarbonColorOptions> = {
   color: {
     default: 0x909090,
-    main: true,
     kind: MiewPropertyOptionKind.color,
   },
 };
