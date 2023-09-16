@@ -7,11 +7,13 @@ import SplitContainerDivider from './divider';
 import type {
   ContainerChild,
   ContainerChildSize,
-  ContainerChildProps,
+  CommonLayoutProps,
   ContainerProps,
+  LayoutSizeInfo,
 } from '../../../@types/components/layout';
 import { useChildrenSize } from '../container/hooks/use-children-sizes';
 import { resizerContext } from './hooks/resize-context';
+import { getSizeInfo } from '../utilities';
 
 export type SplitContainerProps = ContainerProps & {
   dividerSize?: number;
@@ -24,11 +26,12 @@ function getChildKey(child: ContainerChild): Key | undefined {
   return undefined;
 }
 
-function getChildSizeProps(child: ContainerChild): ContainerChildProps {
+function getChildProps(child: ContainerChild): CommonLayoutProps {
   if (child && typeof child !== 'boolean') {
     if (child.type === SpaceContainer) {
       return {
-        flex: true,
+        className: 'mw-space-container',
+        stretch: true,
         minSize: 0,
       };
     }
@@ -42,7 +45,7 @@ function cloneChildElementWithoutProps(child: ContainerChild): ContainerChild {
     return React.cloneElement(child, {
       size: undefined,
       minSize: undefined,
-      flex: true,
+      stretch: true,
     });
   }
   return child;
@@ -54,23 +57,29 @@ function SplitContainer(props: SplitContainerProps) {
   const direction = getDirection(props);
   const childrenWithDividers = useMemo(() => {
     const mapped: ContainerChild[] = [];
+    let previousInfo: LayoutSizeInfo | undefined;
     React.Children.forEach(children, (child, index) => {
       if (child) {
         const key = getChildKey(child) ?? `child-${index}`;
-        if (mapped.length > 0) {
+        const childProps = getChildProps(child);
+        const info = getSizeInfo(childProps.size);
+        if (previousInfo) {
+          const disabled = previousInfo.auto && info.auto;
           mapped.push(
             <SplitContainerDivider
               key={`divider-${key}`}
-              size={dividerSize}
-              minSize={dividerSize}
+              disabled={disabled}
+              size={disabled ? 0 : dividerSize}
+              minSize={disabled ? 0 : dividerSize}
               direction={direction}
               previous={(index - 1) * 2}
               next={index * 2}
             />,
           );
         }
+        previousInfo = info;
         mapped.push(
-          <Container key={key} {...getChildSizeProps(child)}>
+          <Container key={key} {...childProps}>
             {cloneChildElementWithoutProps(child)}
           </Container>,
         );
@@ -78,7 +87,8 @@ function SplitContainer(props: SplitContainerProps) {
     });
     return mapped;
   }, [children, direction]);
-  const [sizes, setSizes] = useChildrenSize(childrenWithDividers);
+  const [sizes, synchronizedChildren, setSizes] =
+    useChildrenSize(childrenWithDividers);
   const context = useMemo(
     () => ({
       sizes,
@@ -93,7 +103,7 @@ function SplitContainer(props: SplitContainerProps) {
         grid
         {...containerProps}
         gridSizes={sizes}>
-        {childrenWithDividers}
+        {synchronizedChildren}
       </Container>
     </resizerContext.Provider>
   );

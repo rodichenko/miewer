@@ -18,47 +18,97 @@ export function getResizeSession(
   const { parentElement } = divider;
   const previousIdx = divider.dataset.previous;
   const nextIdx = divider.dataset.next;
+  const children: HTMLElement[] = [];
+  const dividers = new Set<number>();
+  if (!parentElement || !isIndex(previousIdx) || !isIndex(nextIdx)) {
+    return undefined;
+  }
+  const { children: parentElementChildren } = parentElement;
+  for (let i = 0; i < parentElementChildren.length; i += 1) {
+    const child = parentElementChildren[i];
+    if (!(child instanceof HTMLElement)) {
+      return undefined;
+    }
+    children.push(child);
+    if (child.dataset.divider) {
+      dividers.add(i);
+    }
+  }
   if (
-    parentElement &&
-    isIndex(previousIdx) &&
-    isIndex(nextIdx) &&
-    parentElement.children.length > Number(previousIdx) &&
-    parentElement.children.length > Number(nextIdx) &&
-    parentElement.children[Number(previousIdx)] instanceof HTMLElement &&
-    parentElement.children[Number(nextIdx)] instanceof HTMLElement
+    children.length > Number(previousIdx) &&
+    children.length > Number(nextIdx)
   ) {
-    const previous = parentElement.children[Number(previousIdx)] as HTMLElement;
-    const next = parentElement.children[Number(nextIdx)] as HTMLElement;
-    const previousConfig = sizes[Number(previousIdx)];
-    const nextConfig = sizes[Number(nextIdx)];
     return {
-      previousSize: getSize(previous),
-      previousMinSize:
-        (previousConfig ? previousConfig.minSize : undefined) ?? 50,
+      calculatedSizes: children.map(getSize),
+      calculatedMinSizes: sizes.map(
+        (config) => (config ? config.minSize : undefined) ?? 0,
+      ),
       previousId: Number(previousIdx),
-      nextSize: getSize(next),
-      nextMinSize: (nextConfig ? nextConfig.minSize : undefined) ?? 50,
       nextId: Number(nextIdx),
       grid: parentElement,
+      dividers,
       sizes: shallowCopySizes(sizes),
+      sizesInfo: sizes.map((config) => getSizeInfo(config.size)),
       initialSizes: shallowCopySizes(sizes),
     };
   }
   return undefined;
 }
 
+export function findIndexOfElementToResize(
+  session: ResizeSession,
+  from: number,
+  direction: number,
+  checkSize: boolean,
+): number | undefined {
+  if (direction === 0) {
+    return from;
+  }
+  const inc = Math.sign(direction);
+  let index = from;
+  const { calculatedSizes, calculatedMinSizes, sizesInfo } = session;
+  const check = (idx: number) =>
+    checkSize && calculatedSizes[idx] <= calculatedMinSizes[idx];
+  while (session.dividers.has(index) || sizesInfo[index].auto || check(index)) {
+    if (index >= calculatedSizes.length - 1 || index === 0) {
+      return undefined;
+    }
+    index += inc;
+  }
+  return index;
+}
+
 export function getResizeSessionSizesAfterDrag(
   session: ResizeSession,
   delta: number,
 ): ContainerSizes {
-  let { previousSize, nextSize } = session;
+  const { calculatedSizes, calculatedMinSizes } = session;
+  const previousId = findIndexOfElementToResize(
+    session,
+    session.previousId,
+    -1,
+    delta < 0,
+  );
+  const nextId = findIndexOfElementToResize(
+    session,
+    session.nextId,
+    1,
+    delta > 0,
+  );
+  if (previousId === undefined || nextId === undefined) {
+    return session.sizes;
+  }
+  let previousSize = calculatedSizes[previousId];
+  let nextSize = calculatedSizes[nextId];
+  const previousMinSize = calculatedMinSizes[previousId];
+  const nextMinSize = calculatedMinSizes[nextId];
   const total = previousSize + nextSize;
-  previousSize = Math.max(session.previousMinSize, previousSize + delta);
-  nextSize = Math.max(session.nextMinSize, total - previousSize);
-  previousSize = Math.max(session.previousMinSize, total - nextSize);
+  previousSize = Math.max(previousMinSize, previousSize + delta);
+  nextSize = Math.max(nextMinSize, total - previousSize);
+  previousSize = Math.max(previousMinSize, total - nextSize);
   const newSizes = shallowCopySizes(session.sizes);
-  newSizes[session.previousId].size = previousSize;
-  newSizes[session.nextId].size = nextSize;
+  newSizes[previousId].size = previousSize;
+  newSizes[nextId].size = nextSize;
   return newSizes;
 }
 

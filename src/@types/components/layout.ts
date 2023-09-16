@@ -8,28 +8,37 @@ export type LayoutSizeInfo = {
   fixed: boolean;
   percent: boolean;
   flex: boolean;
+  auto: boolean;
   size?: LayoutSize;
 };
 
-export type ContainerChildProps = {
+export type ContainerChildLayoutProps = {
   size?: LayoutSize;
   minSize?: number;
-  flex?: boolean;
+  stretch?: boolean;
 };
 
-export type ContainerChildSize = ContainerChildProps & {
+export type ContainerChildSize = ContainerChildLayoutProps & {
   key?: Key;
   index: number;
 };
 
 export type CommonLayoutProps<C = ReactNode> = BasicParentComponentProps<C> &
-  ContainerChildProps;
+  ContainerChildLayoutProps;
 
 export type ContainerDirection = 'horizontal' | 'vertical';
+
+export type FlexType =
+  | 'start'
+  | 'center'
+  | 'end'
+  | 'space-between'
+  | 'space-around';
 
 export type ContainerProps = CommonLayoutProps<ContainerChildren> & {
   direction?: ContainerDirection;
   grid?: boolean;
+  flex?: boolean | FlexType;
   gridSizes?: ContainerSizes;
 };
 
@@ -66,14 +75,14 @@ export type DividerCallbacks = {
 };
 
 export type ResizeSession = {
-  previousSize: number;
-  previousMinSize: number;
   previousId: number;
-  nextSize: number;
-  nextMinSize: number;
   nextId: number;
   grid: HTMLElement;
+  dividers: Set<number>;
+  calculatedSizes: number[];
+  calculatedMinSizes: number[];
   sizes: ContainerSizes;
+  sizesInfo: LayoutSizeInfo[];
   initialSizes: ContainerSizes;
 };
 

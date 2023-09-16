@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type {
   SetContainerSizes,
   ContainerChildren,
   ContainerSizes,
+  ContainerChildSize,
 } from '../../../../@types/components/layout';
 import {
   childrenSizesHoldSameKeys,
@@ -13,20 +14,42 @@ import {
 
 export function useChildrenSize(
   children?: ContainerChildren,
-): [ContainerSizes, SetContainerSizes] {
-  const [sizes, setChildSizes] = useState<ContainerSizes>([]);
+): [ContainerSizes, ContainerChildren | undefined, SetContainerSizes] {
+  const [data, setData] = useState<{
+    sizes: ContainerSizes;
+    children: ContainerChildren | undefined;
+  }>({
+    sizes: getChildrenSizes(children),
+    children,
+  });
+  const setChildSizes = useCallback(
+    (newSizes: ContainerSizes) => {
+      setData((current) => ({
+        sizes: newSizes,
+        children: current.children,
+      }));
+    },
+    [setData],
+  );
+  const { sizes, children: synchronizedChildren } = data;
   useEffect(() => {
     const newSizes: ContainerSizes = getChildrenSizes(children);
-    setChildSizes((current) => {
-      const sameKeys = childrenSizesHoldSameKeys(newSizes, current);
+    setData((current) => {
+      const sameKeys = childrenSizesHoldSameKeys(newSizes, current.sizes);
       const recovered = sameKeys
-        ? recoverSizesByKeys(newSizes, current)
+        ? recoverSizesByKeys(newSizes, current.sizes)
         : newSizes;
-      if (!childrenSizesSetsEqual(recovered, current)) {
-        return recovered;
+      if (!childrenSizesSetsEqual(recovered, current.sizes)) {
+        return {
+          sizes: recovered,
+          children,
+        };
       }
-      return current;
+      return {
+        sizes: current.sizes,
+        children,
+      };
     });
-  }, [children, setChildSizes]);
-  return [sizes, setChildSizes];
+  }, [children, setData]);
+  return [sizes, synchronizedChildren, setChildSizes];
 }

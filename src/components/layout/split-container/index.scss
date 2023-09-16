@@ -16,8 +16,10 @@ $divider-out: 10px;
     position: relative;
     overflow: visible;
 
-    &:first-child {
+    &:first-child,
+    &.disabled {
       display: none;
+      pointer-events: none;
     }
 
     .mw-split-container-divider-content {

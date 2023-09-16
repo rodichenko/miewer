@@ -22,6 +22,13 @@ export function isFlexSize(size?: LayoutSize): boolean {
   return typeof size === 'string' && /^(\d+(\.\d+)?)?(\*|fr)/.test(size);
 }
 
+export function isAutoSize(size?: LayoutSize): boolean {
+  return (
+    (typeof size === 'string' && /^auto$/i.test(size)) ||
+    (!isFlexSize(size) && !isPercentSize(size) && !isFixedSize(size))
+  );
+}
+
 export function isLayoutSize(size: any): size is LayoutSize {
   return (
     (typeof size === 'number' || typeof size === 'string') &&
@@ -35,6 +42,7 @@ export function getSizeInfo(size?: LayoutSize): LayoutSizeInfo {
     fixed: isFixedSize(size),
     percent: isPercentSize(size),
     flex: isFlexSize(size),
+    auto: isAutoSize(size),
     size,
   };
 }

@@ -8,6 +8,7 @@ import type {
   LayoutSize,
   ContainerProps,
   ContainerDirection,
+  FlexType,
 } from '../../../@types/components/layout';
 import type { BasicComponentProps } from '../../../@types/components/common';
 import {
@@ -16,6 +17,7 @@ import {
   parseGridSize,
   getFlexStyle,
 } from '../utilities';
+import { SpaceContainer } from './index';
 
 export function childrenSizesHoldSameKeys(
   set1: ContainerSizes,
@@ -70,18 +72,23 @@ export function createChildSizeConfig(
 ): ContainerChildSize {
   let key: Key | undefined;
   let size: LayoutSize | undefined;
-  let minSizeValue: number = minSize ?? 5;
+  let minSizeValue: number = minSize ?? 0;
   if (typeof child !== 'boolean' && child) {
     key = child.key ?? undefined;
-    size = isLayoutSize(child.props.size)
-      ? (child.props.size as LayoutSize)
-      : child.props.flex
-      ? '*'
-      : undefined;
-    minSizeValue =
-      typeof child.props.minSize === 'number'
-        ? Number(child.props.minSize)
-        : minSizeValue;
+    if (child.type === SpaceContainer) {
+      size = '*';
+      minSizeValue = 0;
+    } else {
+      size = isLayoutSize(child.props.size)
+        ? (child.props.size as LayoutSize)
+        : child.props.stretch
+        ? '*'
+        : undefined;
+      minSizeValue =
+        typeof child.props.minSize === 'number'
+          ? Number(child.props.minSize)
+          : minSizeValue;
+    }
   }
   return {
     key: key ?? `child-${index}`,
@@ -180,11 +187,36 @@ export function getDirection(props: {
   return direction;
 }
 
+export function getContainerType(props: ContainerProps): {
+  grid: boolean;
+  flex: FlexType | boolean;
+} {
+  const { grid, flex } = props;
+  if (grid === true) {
+    return {
+      grid: true,
+      flex: false,
+    };
+  }
+  return {
+    grid: false,
+    flex: flex ?? 'start',
+  };
+}
+
 export function getContainerClassName(props: ContainerProps): string {
-  const { className, grid } = props;
-  return classNames(className, 'mw-container', getDirection(props), {
-    'mw-grid': grid,
-  });
+  const { className } = props;
+  const { grid, flex } = getContainerType(props);
+  return classNames(
+    className,
+    'mw-container',
+    getDirection(props),
+    {
+      'mw-grid': grid,
+      'mw-flex': flex,
+    },
+    flex && typeof flex !== 'boolean' ? `mw-flex-${flex}` : false,
+  );
 }
 
 export function mergeStyles(
@@ -212,7 +244,7 @@ export function mapContainerChild<P extends BasicComponentProps>(
   props: ContainerProps,
   size: ContainerChildSize | undefined,
 ): ContainerChild<P> {
-  const { grid } = props;
+  const { grid } = getContainerType(props);
   const direction = getDirection(props);
   if (!child) {
     return null;

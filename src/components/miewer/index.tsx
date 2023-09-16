@@ -13,6 +13,7 @@ import {
 } from '../../stores/miewer-panels-store';
 import RepresentationsList from '../representations';
 import Header from './header';
+import MiewSelectionInfo from '../miew-selection-info';
 
 function Miewer() {
   useThemes();
@@ -24,9 +25,12 @@ function Miewer() {
       <MiewRenderer className="mw-miew" />
       <Container key="root" className="mw-full-size" direction="vertical">
         <Header key="header" />
-        <SplitContainer key="body" flex direction="horizontal">
-          <SplitContainer direction="vertical" flex>
-            <SpaceContainer key="space" />
+        <SplitContainer key="body" stretch direction="horizontal">
+          <SplitContainer key="main" direction="vertical" stretch>
+            <SpaceContainer />
+            <Container key="test" direction="horizontal" flex="center">
+              <MiewSelectionInfo />
+            </Container>
             {showTerminal && (
               <Panel
                 key="terminal"
@@ -39,9 +43,15 @@ function Miewer() {
             )}
           </SplitContainer>
           {showRepresentations && (
-            <Panel key="right" size={300} minSize={300}>
-              <RepresentationsList className="mw-full-size" />
-            </Panel>
+            <SplitContainer
+              key="right"
+              direction="vertical"
+              size={300}
+              minSize={300}>
+              <Panel>
+                <RepresentationsList className="mw-full-size" />
+              </Panel>
+            </SplitContainer>
           )}
         </SplitContainer>
       </Container>

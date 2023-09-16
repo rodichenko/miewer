@@ -5,14 +5,36 @@
   display: grid;
   overflow: auto;
 
-  &.horizontal:not(.mw-grid) {
+  &.horizontal.mw-flex {
     display: flex;
     flex-direction: row;
   }
 
-  &.vertical:not(.mw-grid) {
+  &.vertical.mw-flex {
     display: flex;
     flex-direction: column;
+  }
+
+  .mw-flex {
+    &.mw-flex-start {
+      justify-content: flex-start;
+    }
+
+    &.mw-flex-end {
+      justify-content: flex-end;
+    }
+
+    &.mw-flex-center {
+      justify-content: center;
+    }
+
+    &.mw-flex-space-between {
+      justify-content: space-between;
+    }
+
+    &.mw-flex-space-around {
+      justify-content: space-around;
+    }
   }
 
   &.mw-grid {

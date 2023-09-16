@@ -4,7 +4,7 @@ import type { Color } from 'antd/es/color-picker/color';
 import type { MiewerColorPickerProps } from '../../../@types/components/color-picker';
 import {
   colorValueToString,
-  extractAlphaChannel,
+  extractAlphaChannelFromHexColor,
   stringToColorValue,
 } from '../../../helpers/colors';
 import classNames from 'classnames';
@@ -33,7 +33,7 @@ function MiewerColorPicker(props: MiewerColorPickerProps) {
       if (typeof onChange === 'function') {
         const hex = changed.toHexString();
         const parsed = stringToColorValue(hex);
-        if (extractAlphaChannel(hex) === 0) {
+        if (extractAlphaChannelFromHexColor(hex) === 0) {
           onChange(-1);
         } else {
           onChange(parsed);

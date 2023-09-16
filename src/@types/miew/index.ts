@@ -155,6 +155,119 @@ export type MiewStore = MiewStoreData & MiewStoreActions;
 
 export type MiewPropertyType = DisplayColor | DisplayMode | DisplayMaterial;
 
+export type ItemCallback<T> = (item: T) => void;
+export type ItemIterator<T> = (callback: ItemCallback<T>) => void;
+
+export type Element = {
+  number: number;
+  name: string;
+  fullName: string;
+  weight: number;
+  radius: number;
+  radiusBonding: number;
+  hydrogenValency: number[];
+};
+
+export type Position = {
+  x: number;
+  y: number;
+  z: number;
+};
+
+export type Atom = {
+  name: string;
+  serial: string;
+  location: number;
+  residue: Residue;
+  element: Element;
+  position: Position;
+};
+
+export type ResidueType = {
+  _name: string;
+  _fullName: string;
+  letterCode: string;
+  getName(): string;
+};
+
+export type Residue = {
+  getChain(): Chain;
+  getMolecule(): Molecule;
+  getType(): ResidueType;
+  getSequence(): string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  getICode(): string;
+};
+
+export type Chain = {
+  forEachResidue: ItemIterator<ResidueType>;
+  getName(): string;
+  getComplex(): Complex;
+  getResidueCount(): number;
+};
+
+export type Molecule = {
+  name: string;
+  complex: Complex;
+  forEachResidue: ItemIterator<ResidueType>;
+};
+
+export type PickEventObject = {
+  atom?: Atom;
+  residue?: Residue;
+  molecule?: Molecule;
+  chain?: Chain;
+};
+
+export enum MiewEntityType {
+  atom = 'atom',
+  residue = 'residue',
+  molecule = 'molecule',
+  chain = 'chain',
+}
+
+export type MiewAtom = {
+  type: MiewEntityType.atom;
+  entity: Atom;
+};
+
+export type MiewResidue = {
+  type: MiewEntityType.residue;
+  entity: Residue;
+};
+
+export type MiewChain = {
+  type: MiewEntityType.chain;
+  entity: Chain;
+};
+
+export type MiewMolecule = {
+  type: MiewEntityType.molecule;
+  entity: Molecule;
+};
+
+export type MiewEntity = MiewAtom | MiewResidue | MiewChain | MiewMolecule;
+
+export type PickEvent = {
+  obj?: PickEventObject;
+};
+
+export type Complex = {
+  getChainNames(): string[];
+};
+
+export type ComplexVisual = {
+  getSelectionCount(): number;
+  getComplex(): Complex;
+};
+
+export type MiewSelectionStore = {
+  lastPick: MiewEntity | undefined;
+  selectedAtomsCount: number;
+  setLastPick(entity: MiewEntity | undefined): void;
+  setSelectedAtomsCount(count: number): void;
+};
+
 export {
   displayColors,
   displayMaterials,

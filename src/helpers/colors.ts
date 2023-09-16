@@ -47,12 +47,17 @@ export function stringToColorValue(color: string): MiewerColor {
     const b = stringToHex(getChannel(2));
     return b | (g << channelBits) | ((r << channelBits) << channelBits);
   }
-  const rgb = /^rgba?\((.+)\)$/i.exec(color);
+  const rgb =
+    /^rgba?\(\s*(\d+)\s*[,\s]\s*(\d+)\s*[,\s]\s*(\d+)\s*([,\s/]\s*[\d.]+%?)?\s*\)$/i.exec(
+      color,
+    );
   if (rgb) {
-    const [r, g, b] = rgb[1]
-      .split(',')
-      .map((s) => Math.max(0, Math.min(255, Number(s.trim()))));
-    return b | (g << channelBits) | ((r << channelBits) << channelBits);
+    const r = Math.min(255, Number(rgb[1]));
+    const g = Math.min(255, Number(rgb[2]));
+    const b = Math.min(255, Number(rgb[3]));
+    if (!Number.isNaN(r) && !Number.isNaN(g) && !Number.isNaN(b)) {
+      return b | (g << channelBits) | ((r << channelBits) << channelBits);
+    }
   }
   return 0x0;
 }
@@ -61,11 +66,11 @@ export function stringToColorValue(color: string): MiewerColor {
  * Returns byte value of the alpha channel of the color
  * @param {string} color - color string in hex format (#AABBCC or #AABBCCDD)
  */
-export function extractAlphaChannel(color: string): number {
+export function extractAlphaChannelFromHexColor(color: string): number {
   if (/^#[0-9a-f]{8}$/i.test(color)) {
     // Shorthand color notation
     const getChannel = (index: number) =>
-      color[index + 1].concat(color[index + 1]);
+      color[2 * index + 1].concat(color[2 * index + 2]);
     return stringToHex(getChannel(3));
   }
   return 255;

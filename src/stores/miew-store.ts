@@ -6,6 +6,7 @@ import type {
   ChangeRepresentationCallback,
   MiewOptionsToCodeGenerator,
   MiewStore,
+  PickEvent,
   RemoveRepresentationCallback,
 } from '../@types/miew';
 import type {
@@ -30,6 +31,9 @@ import {
   getMiewOptionsFromUrl,
   appendRepresentationsNamesToUrl,
 } from '../helpers/miew/options';
+import { useMiewSelectionStore } from './miew-selection-store';
+import { getSelectedAtomsCount } from '../helpers/miew/selection';
+import { getEntityFromPickEvent } from '../helpers/miew/entity';
 
 export const useMiewStore = create<MiewStore>((set) => ({
   miew: undefined,
@@ -207,8 +211,10 @@ function useSynchronizedUrlOptions(): void {
 /**
  * Listens Miew events (loading, building representations)
  */
-function useSynchronizedMiewCliOptions() {
+function useMiewEvents() {
   const miew = useMiew();
+  const { setLastPick, setSelectedAtomsCount, lastPick, selectedAtomsCount } =
+    useMiewSelectionStore();
   const { changeRepresentations, setSource } = useMiewStore();
   useEffect(() => {
     if (miew) {
@@ -218,15 +224,27 @@ function useSynchronizedMiewCliOptions() {
       const onMiewBuildingDone = () => {
         changeRepresentations(getMiewRepresentations(miew));
       };
+      const onMiewPick = (event: PickEvent): void => {
+        setSelectedAtomsCount(getSelectedAtomsCount(miew));
+        setLastPick(getEntityFromPickEvent(event));
+      };
       miew.addEventListener('loading', onMiewLoading);
       miew.addEventListener('buildingDone', onMiewBuildingDone);
+      miew.addEventListener('newpick', onMiewPick);
       return () => {
         miew.removeEventListener('loading', onMiewLoading);
         miew.removeEventListener('buildingDone', onMiewBuildingDone);
+        miew.removeEventListener('newpick', onMiewPick);
       };
     }
     return noop;
-  }, [miew, setSource, changeRepresentations]);
+  }, [
+    miew,
+    setSource,
+    changeRepresentations,
+    setSelectedAtomsCount,
+    setLastPick,
+  ]);
 }
 
 /**
@@ -264,8 +282,8 @@ export function useSynchronizedMiewOptions(): MiewOptionsExtended {
   // -----------------------------------------
   // --- Synchronizing events from miew ------
   // (in case of manipulating the miew options
-  // via miew-cli)
-  useSynchronizedMiewCliOptions();
+  // via miew-cli, items selection etc.)
+  useMiewEvents();
   // -----------------------------------------
   // ----- Synchronizing Miewer options ------
   // (changing miew settings via Miewer UI)

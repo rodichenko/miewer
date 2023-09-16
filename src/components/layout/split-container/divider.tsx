@@ -19,6 +19,7 @@ import {
 export type SplitContainerDividerProps = ContainerProps & {
   previous: number;
   next: number;
+  disabled?: boolean;
 };
 
 function getSizeGenerator(direction: ContainerDirection): GetDirectionSize {
@@ -34,7 +35,7 @@ function getSizeGenerator(direction: ContainerDirection): GetDirectionSize {
 }
 
 function SplitContainerDivider(props: SplitContainerDividerProps) {
-  const { className, style, previous, next } = props;
+  const { className, style, disabled, previous, next } = props;
   const { sizes, setSizes } = useContext(resizerContext);
   const session = useRef<ResizeSession | undefined>(undefined);
   const direction = getDirection(props);
@@ -85,10 +86,12 @@ function SplitContainerDivider(props: SplitContainerDividerProps) {
         {
           horizontal: direction === 'horizontal',
           vertical: direction === 'vertical',
+          disabled,
         },
         className,
       )}
       style={style}
+      data-divider={true}
       data-previous={previous}
       data-next={next}>
       <div className="mw-split-container-divider-content">{'\u00A0'}</div>

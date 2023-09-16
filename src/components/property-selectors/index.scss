@@ -1,4 +1,7 @@
 .mw-property-selector-container {
+  max-height: 60vh;
+  overflow: auto;
+
   .mw-property-selector-item-text {
     display: flex;
     width: 100%;

@@ -10,8 +10,10 @@ import { useEffect, useMemo } from 'react';
 import { noop } from '../helpers/rest';
 import { colorValueToString } from '../helpers/colors';
 
+const defaultTheme = darkTheme;
+
 function readThemeFromLocalStorage(): string {
-  return localStorage.getItem('miewer-theme') ?? systemTheme.id;
+  return localStorage.getItem('miewer-theme') ?? defaultTheme.id;
 }
 
 function writeThemeToLocalStorage(id: string) {
@@ -19,14 +21,15 @@ function writeThemeToLocalStorage(id: string) {
 }
 
 const themes = [darkTheme, lightTheme, systemTheme];
-const defaultThemeId: string = readThemeFromLocalStorage();
-const defaultTheme =
-  themes.find((theme) => theme.id === defaultThemeId) ?? systemTheme;
+const defaultLocalStorageThemeId: string = readThemeFromLocalStorage();
+const savedTheme =
+  themes.find((theme) => theme.id === defaultLocalStorageThemeId) ??
+  defaultTheme;
 
 export const useThemesStore = create<ThemesStore>((set) => ({
   themes,
-  theme: defaultTheme,
-  themeConfig: getThemeConfig(defaultTheme),
+  theme: savedTheme,
+  themeConfig: getThemeConfig(savedTheme),
   setTheme(theme: string | Theme) {
     set((state) => {
       if (typeof theme === 'string') {

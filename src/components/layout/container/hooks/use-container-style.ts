@@ -5,12 +5,18 @@ import type {
   ContainerSizes,
 } from '../../../../@types/components/layout';
 import { useChildrenSize } from './use-children-sizes';
-import { getDirection, getGridStyle, mergeStyles } from '../utilities';
+import {
+  getContainerType,
+  getDirection,
+  getGridStyle,
+  mergeStyles,
+} from '../utilities';
 
 export function useContainerStyle(
   props: ContainerProps,
 ): [CSSProperties | undefined, ContainerSizes] {
-  const { grid, style, children, gridSizes } = props;
+  const { grid } = getContainerType(props);
+  const { style, children, gridSizes } = props;
   const [childrenSizes] = useChildrenSize(children ?? []);
   const sizes: ContainerSizes = gridSizes ?? childrenSizes;
   const direction = getDirection(props);
