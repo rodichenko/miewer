@@ -28,7 +28,11 @@ function Miewer() {
         <SplitContainer key="body" stretch direction="horizontal">
           <SplitContainer key="main" direction="vertical" stretch>
             <SpaceContainer />
-            <Container key="test" direction="horizontal" flex="center">
+            <Container
+              key="selection-info"
+              direction="horizontal"
+              size="auto"
+              flex="center">
               <MiewSelectionInfo />
             </Container>
             {showTerminal && (

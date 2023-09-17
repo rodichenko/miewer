@@ -11,13 +11,8 @@ import type {
   FlexType,
 } from '../../../@types/components/layout';
 import type { BasicComponentProps } from '../../../@types/components/common';
-import {
-  shallowCopySizes,
-  isLayoutSize,
-  parseGridSize,
-  getFlexStyle,
-} from '../utilities';
-import { SpaceContainer } from './index';
+import { shallowCopySizes, parseGridSize, getFlexStyle } from '../utilities';
+import SpaceContainer from './space-container';
 
 export function childrenSizesHoldSameKeys(
   set1: ContainerSizes,
@@ -65,43 +60,48 @@ export function childrenSizesSetsEqual(
   return false;
 }
 
+export function extractChildSizeConfiguration(
+  child: ContainerChild,
+  defaultSize: LayoutSize = 'auto',
+): { size: LayoutSize; minSize: number } {
+  if (child && typeof child !== 'boolean') {
+    if (child.type === SpaceContainer) {
+      return { size: '*', minSize: 0 };
+    }
+    const { size, stretch, minSize } = child.props;
+    if (size !== undefined) {
+      return { size, minSize: minSize ?? 0 };
+    }
+    if (stretch) {
+      return { size: '*', minSize: minSize ?? 0 };
+    }
+  }
+  return { size: defaultSize, minSize: 5 };
+}
+
 export function createChildSizeConfig(
   child: ContainerChild,
   index: number,
-  minSize?: number,
+  defaultSize: LayoutSize = 'auto',
 ): ContainerChildSize {
   let key: Key | undefined;
-  let size: LayoutSize | undefined;
-  let minSizeValue: number = minSize ?? 0;
   if (typeof child !== 'boolean' && child) {
     key = child.key ?? undefined;
-    if (child.type === SpaceContainer) {
-      size = '*';
-      minSizeValue = 0;
-    } else {
-      size = isLayoutSize(child.props.size)
-        ? (child.props.size as LayoutSize)
-        : child.props.stretch
-        ? '*'
-        : undefined;
-      minSizeValue =
-        typeof child.props.minSize === 'number'
-          ? Number(child.props.minSize)
-          : minSizeValue;
-    }
   }
   return {
     key: key ?? `child-${index}`,
     index,
-    size: size ?? 'auto',
-    minSize: minSizeValue,
+    ...extractChildSizeConfiguration(child, defaultSize),
   };
 }
 
-export function getChildrenSizes(children: ContainerChildren): ContainerSizes {
+export function getChildrenSizes(
+  children: ContainerChildren,
+  defaultSize?: LayoutSize,
+): ContainerSizes {
   const sizes: ContainerSizes = [];
   Children.forEach(children, (child, index) => {
-    sizes.push(createChildSizeConfig(child, index));
+    sizes.push(createChildSizeConfig(child, index, defaultSize));
   });
   return sizes;
 }

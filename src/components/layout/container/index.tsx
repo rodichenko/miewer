@@ -5,6 +5,7 @@ import {
   getContainerClassName,
   mapContainerChild,
 } from './utilities';
+import SpaceContainer from './space-container';
 import { useContainerStyle } from './hooks/use-container-style';
 
 function Container(props: ContainerProps) {
@@ -21,8 +22,6 @@ function Container(props: ContainerProps) {
   );
 }
 
-export function SpaceContainer() {
-  return null;
-}
+export { SpaceContainer };
 
 export default Container;

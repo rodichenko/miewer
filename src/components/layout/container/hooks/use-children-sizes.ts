@@ -3,7 +3,7 @@ import type {
   SetContainerSizes,
   ContainerChildren,
   ContainerSizes,
-  ContainerChildSize,
+  LayoutSize,
 } from '../../../../@types/components/layout';
 import {
   childrenSizesHoldSameKeys,
@@ -14,12 +14,13 @@ import {
 
 export function useChildrenSize(
   children?: ContainerChildren,
+  defaultSize?: LayoutSize,
 ): [ContainerSizes, ContainerChildren | undefined, SetContainerSizes] {
   const [data, setData] = useState<{
     sizes: ContainerSizes;
     children: ContainerChildren | undefined;
   }>({
-    sizes: getChildrenSizes(children),
+    sizes: getChildrenSizes(children, defaultSize),
     children,
   });
   const setChildSizes = useCallback(
@@ -33,7 +34,7 @@ export function useChildrenSize(
   );
   const { sizes, children: synchronizedChildren } = data;
   useEffect(() => {
-    const newSizes: ContainerSizes = getChildrenSizes(children);
+    const newSizes: ContainerSizes = getChildrenSizes(children, defaultSize);
     setData((current) => {
       const sameKeys = childrenSizesHoldSameKeys(newSizes, current.sizes);
       const recovered = sameKeys
@@ -50,6 +51,6 @@ export function useChildrenSize(
         children,
       };
     });
-  }, [children, setData]);
+  }, [children, defaultSize, setData]);
   return [sizes, synchronizedChildren, setChildSizes];
 }

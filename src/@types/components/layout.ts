@@ -1,7 +1,7 @@
 import type { ReactNode, ReactElement, Key } from 'react';
 import type { BasicParentComponentProps } from './common';
 
-export type LayoutSize = string | number;
+export type LayoutSize = 'auto' | string | number;
 
 export type LayoutSizeInfo = {
   value: number;
@@ -15,7 +15,7 @@ export type LayoutSizeInfo = {
 export type ContainerChildLayoutProps = {
   size?: LayoutSize;
   minSize?: number;
-  stretch?: boolean;
+  stretch?: boolean; // Alias for `size="*"`
 };
 
 export type ContainerChildSize = ContainerChildLayoutProps & {
@@ -40,9 +40,10 @@ export type ContainerProps = CommonLayoutProps<ContainerChildren> & {
   grid?: boolean;
   flex?: boolean | FlexType;
   gridSizes?: ContainerSizes;
+  defaultChildSize?: LayoutSize;
 };
 
-export type ContainerChild<P = any> =
+export type ContainerChild<P extends CommonLayoutProps = CommonLayoutProps> =
   | boolean
   | ReactElement<P>
   | undefined

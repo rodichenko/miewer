@@ -1,12 +1,14 @@
 import React, { useMemo } from 'react';
 import type { Key } from 'react';
 import classNames from 'classnames';
-import Container, { SpaceContainer } from '../container';
-import { getDirection } from '../container/utilities';
+import Container from '../container';
+import {
+  getDirection,
+  extractChildSizeConfiguration,
+} from '../container/utilities';
 import SplitContainerDivider from './divider';
 import type {
   ContainerChild,
-  ContainerChildSize,
   CommonLayoutProps,
   ContainerProps,
   LayoutSizeInfo,
@@ -14,6 +16,8 @@ import type {
 import { useChildrenSize } from '../container/hooks/use-children-sizes';
 import { resizerContext } from './hooks/resize-context';
 import { getSizeInfo } from '../utilities';
+
+const splitContainerDefaultChildSize = '*';
 
 export type SplitContainerProps = ContainerProps & {
   dividerSize?: number;
@@ -28,16 +32,12 @@ function getChildKey(child: ContainerChild): Key | undefined {
 
 function getChildProps(child: ContainerChild): CommonLayoutProps {
   if (child && typeof child !== 'boolean') {
-    if (child.type === SpaceContainer) {
-      return {
-        className: 'mw-space-container',
-        stretch: true,
-        minSize: 0,
-      };
-    }
-    return child.props as ContainerChildSize;
+    return {
+      ...(child.props ?? {}),
+      ...extractChildSizeConfiguration(child, splitContainerDefaultChildSize),
+    };
   }
-  return {};
+  return extractChildSizeConfiguration(child, splitContainerDefaultChildSize);
 }
 
 function cloneChildElementWithoutProps(child: ContainerChild): ContainerChild {
@@ -51,6 +51,8 @@ function cloneChildElementWithoutProps(child: ContainerChild): ContainerChild {
   return child;
 }
 
+declare type LayoutSizeInfoWithIndex = LayoutSizeInfo & { index: number };
+
 function SplitContainer(props: SplitContainerProps) {
   const { children, className, dividerSize = 4, ...containerProps } = props;
   const splitContainerClassName = classNames(className, 'mw-split-container');
@@ -58,24 +60,30 @@ function SplitContainer(props: SplitContainerProps) {
   const childrenWithDividers = useMemo(() => {
     const mapped: ContainerChild[] = [];
     let previousInfo: LayoutSizeInfo | undefined;
+    let previousResizableInfo: LayoutSizeInfoWithIndex | undefined;
+    let childIndex = -1;
     React.Children.forEach(children, (child, index) => {
       if (child) {
         const key = getChildKey(child) ?? `child-${index}`;
         const childProps = getChildProps(child);
         const info = getSizeInfo(childProps.size);
-        if (previousInfo) {
-          const disabled = previousInfo.auto && info.auto;
+        const resizable = !info.auto;
+        if (previousResizableInfo && resizable) {
+          childIndex += 1;
           mapped.push(
             <SplitContainerDivider
               key={`divider-${key}`}
-              disabled={disabled}
-              size={disabled ? 0 : dividerSize}
-              minSize={disabled ? 0 : dividerSize}
+              size={dividerSize}
+              minSize={dividerSize}
               direction={direction}
-              previous={(index - 1) * 2}
-              next={index * 2}
+              previous={previousResizableInfo.index}
+              next={childIndex + 1}
             />,
           );
+        }
+        childIndex += 1;
+        if (resizable) {
+          previousResizableInfo = { ...info, index: childIndex };
         }
         previousInfo = info;
         mapped.push(
@@ -87,8 +95,10 @@ function SplitContainer(props: SplitContainerProps) {
     });
     return mapped;
   }, [children, direction]);
-  const [sizes, synchronizedChildren, setSizes] =
-    useChildrenSize(childrenWithDividers);
+  const [sizes, synchronizedChildren, setSizes] = useChildrenSize(
+    childrenWithDividers,
+    splitContainerDefaultChildSize,
+  );
   const context = useMemo(
     () => ({
       sizes,
@@ -102,6 +112,7 @@ function SplitContainer(props: SplitContainerProps) {
         className={splitContainerClassName}
         grid
         {...containerProps}
+        defaultChildSize={splitContainerDefaultChildSize}
         gridSizes={sizes}>
         {synchronizedChildren}
       </Container>

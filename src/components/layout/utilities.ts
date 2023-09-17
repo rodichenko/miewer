@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type {
+  ContainerChild,
   ContainerChildSize,
   ContainerDirection,
   ContainerSizes,
@@ -23,17 +24,7 @@ export function isFlexSize(size?: LayoutSize): boolean {
 }
 
 export function isAutoSize(size?: LayoutSize): boolean {
-  return (
-    (typeof size === 'string' && /^auto$/i.test(size)) ||
-    (!isFlexSize(size) && !isPercentSize(size) && !isFixedSize(size))
-  );
-}
-
-export function isLayoutSize(size: any): size is LayoutSize {
-  return (
-    (typeof size === 'number' || typeof size === 'string') &&
-    (isFixedSize(size) || isPercentSize(size) || isFlexSize(size))
-  );
+  return typeof size === 'string' && /^auto$/i.test(size);
 }
 
 export function getSizeInfo(size?: LayoutSize): LayoutSizeInfo {
