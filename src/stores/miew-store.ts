@@ -32,8 +32,13 @@ import {
   appendRepresentationsNamesToUrl,
 } from '../helpers/miew/options';
 import { useMiewSelectionStore } from './miew-selection-store';
-import { getSelectedAtomsCount } from '../helpers/miew/selection';
+import {
+  getSelectedAtomsCount,
+  getSelectedResidues,
+} from '../helpers/miew/selection';
 import { getEntityFromPickEvent } from '../helpers/miew/entity';
+import { getChainSequences } from '../helpers/miew/sequences';
+import { useMoleculeStructureStore } from './miew-molecule-structure-store';
 
 export const useMiewStore = create<MiewStore>((set) => ({
   miew: undefined,
@@ -213,20 +218,24 @@ function useSynchronizedUrlOptions(): void {
  */
 function useMiewEvents() {
   const miew = useMiew();
-  const { setLastPick, setSelectedAtomsCount, lastPick, selectedAtomsCount } =
-    useMiewSelectionStore();
+  const { setData } = useMiewSelectionStore();
   const { changeRepresentations, setSource } = useMiewStore();
+  const { setChains } = useMoleculeStructureStore();
   useEffect(() => {
     if (miew) {
       const onMiewLoading = (event: { source: string }) => {
         setSource(event.source);
       };
       const onMiewBuildingDone = () => {
+        setChains(getChainSequences(miew));
         changeRepresentations(getMiewRepresentations(miew));
       };
       const onMiewPick = (event: PickEvent): void => {
-        setSelectedAtomsCount(getSelectedAtomsCount(miew));
-        setLastPick(getEntityFromPickEvent(event));
+        setData({
+          selectedAtomsCount: getSelectedAtomsCount(miew),
+          lastPick: getEntityFromPickEvent(event),
+          selectedResidues: getSelectedResidues(miew),
+        });
       };
       miew.addEventListener('loading', onMiewLoading);
       miew.addEventListener('buildingDone', onMiewBuildingDone);
@@ -238,13 +247,7 @@ function useMiewEvents() {
       };
     }
     return noop;
-  }, [
-    miew,
-    setSource,
-    changeRepresentations,
-    setSelectedAtomsCount,
-    setLastPick,
-  ]);
+  }, [miew, setSource, changeRepresentations, setData]);
 }
 
 /**
@@ -273,6 +276,17 @@ function useSynchronizedUserOptions() {
   }, [proxy, options]);
 }
 
+function useSynchronizedSelection() {
+  const { selector, setSelectedAtomsCount } = useMiewSelectionStore();
+  const miew = useMiew();
+  useEffect(() => {
+    if (miew) {
+      miew.select(selector, false);
+      setSelectedAtomsCount(getSelectedAtomsCount(miew));
+    }
+  }, [selector, miew, setSelectedAtomsCount]);
+}
+
 export function useSynchronizedMiewOptions(): MiewOptionsExtended {
   // --- Synchronizing global Miewer theme ---
   useSynchronizeMiewBackgroundWithTheme();
@@ -288,6 +302,9 @@ export function useSynchronizedMiewOptions(): MiewOptionsExtended {
   // ----- Synchronizing Miewer options ------
   // (changing miew settings via Miewer UI)
   useSynchronizedUserOptions();
+  // -----------------------------------------
+  // ------- Synchronizing selection ---------
+  useSynchronizedSelection();
   return useMiewOptions();
 }
 

@@ -28,6 +28,22 @@ export function colorValueToString(color: MiewerColor, alpha?: number): string {
   )}`;
 }
 
+export function colorValueToChannels(
+  color: MiewerColor,
+  alpha?: number,
+): { r: number; g: number; b: number; a: number } {
+  const positiveValue = Math.abs(color);
+  const r = ((positiveValue >> channelBits) >> channelBits) & 0xff;
+  const g = (positiveValue >> channelBits) & 0xff;
+  const b = positiveValue & 0xff;
+  return {
+    r,
+    g,
+    b,
+    a: alpha ?? 255,
+  };
+}
+
 export function stringToColorValue(color: string): MiewerColor {
   if (/^#[0-9a-f]{3}$/i.test(color)) {
     // Shorthand color notation

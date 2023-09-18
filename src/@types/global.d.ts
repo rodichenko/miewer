@@ -9,6 +9,11 @@ declare module '*.scss' {
   export default content;
 }
 
+declare module '*.glsl' {
+  const content: string;
+  export default content;
+}
+
 declare type OnMiewResponse = (response: any) => void;
 declare type MiewExec = (
   command: string,

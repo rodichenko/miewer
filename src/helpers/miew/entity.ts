@@ -5,6 +5,7 @@ import type {
   MiewMolecule,
   MiewResidue,
   PickEvent,
+  Residue,
 } from '../../@types/miew';
 import { MiewEntityType } from '../../@types/miew';
 
@@ -52,4 +53,14 @@ export function getEntityFromPickEvent(
     };
   }
   return undefined;
+}
+
+export function isWater(residue: Residue): boolean {
+  const type = residue.getType();
+  // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/no-unsafe-assignment
+  const { Flags } = type.constructor as any;
+  if (Flags?.WATER) {
+    return type.flags === Flags.WATER;
+  }
+  return false;
 }

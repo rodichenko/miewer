@@ -1,0 +1,9 @@
+.chain-sequence {
+  user-select: none;
+
+  .mw-chain-sequence-canvas {
+    width: 100%;
+    overflow: hidden;
+    min-height: 1px;
+  }
+}

@@ -85,6 +85,21 @@ export function arraysEquals<T, U>(original: T[], comparing: U[]): boolean {
   return true;
 }
 
+export function arraysShallowEquals<T, U>(
+  original: T[],
+  comparing: U[],
+): boolean {
+  if (original.length !== comparing.length) {
+    return false;
+  }
+  for (let i = 0; i < original.length; i += 1) {
+    if ((original[i] as any) !== (comparing[i] as any)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function objectsEquals<T, U>(original: T, comparing: U): boolean {
   if (!original && !comparing) {
     return true;
@@ -205,5 +220,22 @@ export function escapeRegExp(
       `\\${character}`,
     );
   });
+  return result;
+}
+
+export function getRangesFromNumberArray(
+  array: number[],
+): Array<[number, number]> {
+  const result: Array<[number, number]> = [];
+  const uniqueSorted = [...new Set(array)].sort((a, b) => a - b);
+  for (const item of uniqueSorted) {
+    if (result.length === 0) {
+      result.push([item, item]);
+    } else if (result[result.length - 1][1] < item - 1) {
+      result.push([item, item]);
+    } else {
+      result[result.length - 1][1] = item;
+    }
+  }
   return result;
 }

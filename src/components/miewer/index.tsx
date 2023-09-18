@@ -13,12 +13,17 @@ import {
 } from '../../stores/miewer-panels-store';
 import RepresentationsList from '../representations';
 import Header from './header';
-import MiewSelectionInfo from '../miew-selection-info';
+import MiewSelectionInfo, {
+  useMiewSelectionInfoVisible,
+} from '../miew-selection-info';
+import ChainSequences, { useShowChainSequences } from '../chain-sequences';
 
 function Miewer() {
   useThemes();
   const showTerminal = isTerminalVisible();
   const showRepresentations = isRepresentationsVisible();
+  const showChainSequences = useShowChainSequences();
+  const showSelectionInfo = useMiewSelectionInfoVisible();
   const antdTheme: ThemeConfig = useAntdThemes();
   return (
     <ConfigProvider componentSize="small" theme={antdTheme}>
@@ -27,14 +32,21 @@ function Miewer() {
         <Header key="header" />
         <SplitContainer key="body" stretch direction="horizontal">
           <SplitContainer key="main" direction="vertical" stretch>
+            {showChainSequences && (
+              <Panel key="structure" size="auto">
+                <ChainSequences />
+              </Panel>
+            )}
             <SpaceContainer />
-            <Container
-              key="selection-info"
-              direction="horizontal"
-              size="auto"
-              flex="center">
-              <MiewSelectionInfo />
-            </Container>
+            {showSelectionInfo && (
+              <Container
+                key="selection-info"
+                direction="horizontal"
+                size="auto"
+                flex="center">
+                <MiewSelectionInfo />
+              </Container>
+            )}
             {showTerminal && (
               <Panel
                 key="terminal"

@@ -9,9 +9,13 @@ const {
   darkBackground = '#222',
   darkForeground = '#cacaca',
   darkError = '#d13460',
+  darkSelectionBackground = '#e78d04',
+  darkSelectionForeground = '#222',
   lightBackground = '#f0f0f0',
   lightForeground = '#333',
   lightError = '#d90f45',
+  lightSelectionBackground = '#e78d04',
+  lightSelectionForeground = '#222',
 } = variables || {};
 
 export const darkTheme: PredefinedTheme = {
@@ -19,6 +23,8 @@ export const darkTheme: PredefinedTheme = {
   title: 'Dark theme',
   background: stringToColorValue(darkBackground),
   foreground: stringToColorValue(darkForeground),
+  selectionBackground: stringToColorValue(darkSelectionBackground),
+  selectionForeground: stringToColorValue(darkSelectionForeground),
   error: stringToColorValue(darkError),
   fontFamily,
   fontSize: mapFontSize(fontSize),
@@ -29,6 +35,8 @@ export const lightTheme: PredefinedTheme = {
   title: 'Light theme',
   background: stringToColorValue(lightBackground),
   foreground: stringToColorValue(lightForeground),
+  selectionBackground: stringToColorValue(lightSelectionBackground),
+  selectionForeground: stringToColorValue(lightSelectionForeground),
   error: stringToColorValue(lightError),
   fontFamily,
   fontSize: mapFontSize(fontSize),

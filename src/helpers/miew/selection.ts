@@ -6,6 +6,7 @@ import type {
   Molecule,
   Residue,
 } from '../../@types/miew';
+import { getRangesFromNumberArray } from '../rest';
 
 export function getSelectedAtomsCount(miew: Miew): number {
   let count = 0;
@@ -50,4 +51,31 @@ export function getChainDescription(chain: Chain): string {
 
 export function getMoleculeDescription(molecule: Molecule): string {
   return `molecule: ${molecule.name}`;
+}
+
+export function getSelectedResidues(miew: Miew): Residue[] {
+  const selection: Residue[] = [];
+  miew._forEachComplexVisual((complexVisual: ComplexVisual) => {
+    complexVisual.forSelectedResidues((residue: Residue) => {
+      selection.push(residue);
+    });
+  });
+  return selection;
+}
+
+export function getSelectorFromSelectedResidues(residues: Residue[]): string {
+  const ranges = getRangesFromNumberArray(
+    residues.map((residue) => residue._index),
+  );
+  if (!ranges.length) {
+    return 'none';
+  }
+  const rangesString = ranges
+    .map(([start, end]) =>
+      start === end
+        ? start.toString()
+        : [start.toString(), end.toString()].join(':'),
+    )
+    .join(',');
+  return `residx ${rangesString}`;
 }

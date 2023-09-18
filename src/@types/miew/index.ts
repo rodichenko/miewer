@@ -100,6 +100,14 @@ export type Representation = {
   colorer?: Colorer;
   material?: Material;
 };
+
+export type ColorerInstance = {
+  getResidueColor(residue: Residue, complex: Complex): number;
+};
+
+export type RepresentationInstance = {
+  colorer: ColorerInstance;
+};
 export type MiewOptionsExtended = MiewOptions & {
   source?: string;
   reps?: Representation[];
@@ -184,6 +192,7 @@ export type Atom = {
 };
 
 export type ResidueType = {
+  flags: number;
   _name: string;
   _fullName: string;
   letterCode: string;
@@ -191,6 +200,7 @@ export type ResidueType = {
 };
 
 export type Residue = {
+  _index: number;
   getChain(): Chain;
   getMolecule(): Molecule;
   getType(): ResidueType;
@@ -200,10 +210,27 @@ export type Residue = {
 };
 
 export type Chain = {
-  forEachResidue: ItemIterator<ResidueType>;
+  forEachResidue: ItemIterator<Residue>;
   getName(): string;
   getComplex(): Complex;
   getResidueCount(): number;
+};
+
+export type SequenceItem = {
+  letterCode: string;
+  code: string;
+  name: string;
+  index: number;
+  colorer: ColorerInstance | undefined;
+  residue: Residue;
+  complex: Complex;
+};
+
+export type ChainSequence = {
+  chain: Chain;
+  complex: Complex;
+  sequence: SequenceItem[];
+  colorer: ColorerInstance | undefined;
 };
 
 export type Molecule = {
@@ -254,19 +281,46 @@ export type PickEvent = {
 
 export type Complex = {
   getChainNames(): string[];
+  getChain(chain: string): Chain;
 };
 
 export type ComplexVisual = {
+  forSelectedResidues: ItemIterator<Residue>;
   getSelectionCount(): number;
   getComplex(): Complex;
+  repGet(): RepresentationInstance | undefined;
 };
 
-export type MiewSelectionStore = {
+export type MiewSelectionData = {
   lastPick: MiewEntity | undefined;
   selectedAtomsCount: number;
+  selectedResidues: Residue[];
+  selector: string;
+};
+
+export type MiewSelectionActions = {
   setLastPick(entity: MiewEntity | undefined): void;
   setSelectedAtomsCount(count: number): void;
+  setSelectedResidues(residues: Residue[]): void;
+  setData(data: Partial<MiewSelectionData>): void;
 };
+
+export type MiewSelectionStore = MiewSelectionData & MiewSelectionActions;
+
+export type MiewMoleculeStructureData = {
+  chainNames: string[];
+  chains: ChainSequence[];
+};
+
+export type MiewMoleculeStructureActions = {
+  getChain(chain: string): ChainSequence | undefined;
+  setChains(chains: ChainSequence[]): void;
+};
+
+export type MiewMoleculeStructureStore = MiewMoleculeStructureData &
+  MiewMoleculeStructureActions;
+
+export type ResidueSelectionCallback = (residues: Residue[]) => void;
 
 export {
   displayColors,

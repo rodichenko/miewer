@@ -11,6 +11,8 @@ export type PredefinedTheme = Theme & {
   readonly error: MiewerColor;
   readonly fontFamily: string;
   readonly fontSize: number;
+  readonly selectionBackground: MiewerColor;
+  readonly selectionForeground: MiewerColor;
   readonly dark: boolean;
 };
 

@@ -16,12 +16,20 @@ import {
 } from '../../helpers/miew/selection';
 import classNames from 'classnames';
 
+export function useMiewSelectionInfoVisible(): boolean {
+  const { lastPick, selectedAtomsCount } = useMiewSelectionStore();
+  return selectedAtomsCount > 0 || Boolean(lastPick);
+}
+
 function MiewSelectionInfo(props: BasicComponentProps) {
   const { className, style } = props;
   const { lastPick, selectedAtomsCount: count } = useMiewSelectionStore();
   const lastPickDescription = useMemo<string | undefined>(() => {
-    if (!lastPick) {
+    if (!lastPick && count === 0) {
       return undefined;
+    }
+    if (!lastPick) {
+      return `${count} atom${count === 1 ? '' : 's'} selected`;
     }
     const base = `${count} atom${count === 1 ? '' : 's'} selected, last pick:`;
     const info = [];

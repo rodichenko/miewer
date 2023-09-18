@@ -11,6 +11,8 @@ $dark-foreground-accent: #eee;
 $dark-error: #d13460;
 $dark-error-faded: #7a243d;
 $dark-miew-background: $dark-background;
+$dark-selection-background: #e78d04;
+$dark-selection-foreground: #222;
 $light-background: #f0f0f0;
 $light-background-accent: #fafafa;
 $light-background-faded: #e0e0e0;
@@ -20,6 +22,8 @@ $light-foreground-accent: #111;
 $light-error: #d90f45;
 $light-error-faded: #ef5c83;
 $light-miew-background: $light-background;
+$light-selection-background: #e78d04;
+$light-selection-foreground: #222;
 
 @mixin dark-theme {
   @include components(
@@ -75,8 +79,12 @@ body {
   darkBackground: $dark-background;
   darkForeground: $dark-foreground;
   darkError: $dark-error;
+  darkSelectionBackground: $dark-selection-background;
+  darkSelectionForeground: $dark-selection-foreground;
   lightBackground: $light-miew-background;
   lightForeground: $light-foreground;
   lightError: $light-error;
+  lightSelectionBackground: $light-selection-background;
+  lightSelectionForeground: $light-selection-foreground;
 }
 /* stylelint-enable */
