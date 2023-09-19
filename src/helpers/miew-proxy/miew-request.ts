@@ -1,6 +1,5 @@
 import type { Miew } from 'miew';
 import type { MiewOptionsExtended } from '../../@types/miew';
-import { cloneRepresentation } from '../miew/representations';
 import { processOptions } from './preprocess-options';
 
 abstract class MiewRequest {
@@ -50,14 +49,13 @@ class MiewOptionsRequest extends MiewRequest {
       miew.applyPreset(preset);
     }
     if (reps) {
-      // Const repsCount = miew.repCount(undefined) as number;
-      // reps.forEach((rep, idx) => {
-      //   miew.rep(idx, rep);
-      // });
-      // for (let i = reps.length; i < repsCount; i += 1) {
-      //   miew.repRemove(i, undefined);
-      // }
-      miew.setOptions({ reps: reps.map(cloneRepresentation) });
+      const repsCount = miew.repCount(undefined) as number;
+      reps.forEach((rep, idx) => {
+        miew.rep(idx, rep);
+      });
+      for (let i = reps.length; i < repsCount; i += 1) {
+        miew.repRemove(i, undefined);
+      }
     }
     callback();
   }

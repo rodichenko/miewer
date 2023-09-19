@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { AlignCenterOutlined, SettingOutlined } from '@ant-design/icons';
 import type { PanelRootAction } from '../../@types/components/panels';
 import { useMiewSelectionStore } from '../../stores/miew-selection-store';
 import { useCreateMiewRepresentation } from '../../stores/miew-store';
@@ -37,6 +38,7 @@ export default function useChainSequencesActions(): PanelRootAction[] {
     actions.push({
       key: 'config',
       title: 'Appearance',
+      icon: SettingOutlined,
       actions: [
         {
           key: 'display-type-letter',
@@ -70,6 +72,7 @@ export default function useChainSequencesActions(): PanelRootAction[] {
     actions.push({
       key: 'selection',
       title: 'Selection',
+      icon: AlignCenterOutlined,
       disabled: !hasSelection,
       actions: [
         {
