@@ -50,8 +50,14 @@ class MiewOptionsRequest extends MiewRequest {
       miew.applyPreset(preset);
     }
     if (reps) {
-      const cloned = reps.map(cloneRepresentation);
-      miew.setOptions({ reps: cloned });
+      // Const repsCount = miew.repCount(undefined) as number;
+      // reps.forEach((rep, idx) => {
+      //   miew.rep(idx, rep);
+      // });
+      // for (let i = reps.length; i < repsCount; i += 1) {
+      //   miew.repRemove(i, undefined);
+      // }
+      miew.setOptions({ reps: reps.map(cloneRepresentation) });
     }
     callback();
   }
@@ -64,6 +70,10 @@ class MiewRequestProcessor {
   constructor(miew: Miew) {
     this._miew = miew;
     this._queue = [];
+  }
+
+  get busy(): boolean {
+    return Boolean(this._requestInProgress);
   }
 
   registerRequest(request: MiewRequest): void {

@@ -831,8 +831,9 @@ class ChainRenderer {
       sliderVerticalPosition,
       theme,
     } = this;
-    const { foreground, selectionBackground } = theme ?? {
+    const { foreground, foregroundFaded, selectionBackground } = theme ?? {
       foreground: 0xfafafa,
+      foregroundFaded: 0x777777,
       selectionBackground: 0xe78d04,
     };
     if (
@@ -894,7 +895,7 @@ class ChainRenderer {
       chain.sequence.forEach((item, index) => {
         const color =
           !this.useColorer || !item.colorer
-            ? colorValueToString(foreground)
+            ? colorValueToString(this.useColorer ? foregroundFaded : foreground)
             : colorValueToString(
                 item.colorer.getResidueColor(item.residue, item.complex),
               );
@@ -955,8 +956,9 @@ class ChainRenderer {
     this.applyTheme(ctx);
 
     const { chain, position, visibleItemsCount, itemSize, theme } = this;
-    const { foreground, selectionBackground } = theme ?? {
+    const { foreground, foregroundFaded, selectionBackground } = theme ?? {
       foreground: 0xfafafa,
+      foregroundFaded: 0x777777,
       selectionBackground: 0xe78d04,
     };
     if (chain && chain.sequence.length > 0) {
@@ -990,7 +992,7 @@ class ChainRenderer {
           index >= position - 1 && index <= position + visibleItemsCount;
         const color =
           !this.useColorer || !item.colorer
-            ? colorValueToString(foreground)
+            ? colorValueToString(this.useColorer ? foregroundFaded : foreground)
             : colorValueToString(
                 item.colorer.getResidueColor(item.residue, item.complex),
               );

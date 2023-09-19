@@ -20,7 +20,7 @@ export function processRepresentations(
 export function processOptions(
   options: Partial<MiewOptionsExtended>,
 ): Partial<MiewOptionsExtended> {
-  const { reps, source, ...rest } = options;
+  const { reps, source, searchRequest, ...rest } = options;
   return {
     ...rest,
     reps: processRepresentations(reps),

@@ -18,6 +18,10 @@ class MiewProxy {
     this.requestOptions(options ?? {});
   }
 
+  get busy(): boolean {
+    return this._processor.busy;
+  }
+
   requestOptions(options: MiewOptionsExtended) {
     const { load, ...rest } = options;
     if (load && this._source !== load) {

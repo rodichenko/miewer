@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { create } from 'zustand';
 import { produce } from 'immer';
 import type { Miew } from 'miew';
@@ -15,6 +15,7 @@ import type {
   Representation,
   CreateRepresentationCallback,
   AddRepresentationCallback,
+  MiewProxy as MiewProxyType,
 } from '../@types/miew';
 import type { MiewerColor } from '../@types/base';
 import { useThemeConfig } from './themes-store';
@@ -30,7 +31,10 @@ import {
   getMiewOptionsFromUrl,
   appendRepresentationsNamesToUrl,
 } from '../helpers/miew/options';
-import { useMiewSelectionStore } from './miew-selection-store';
+import {
+  useMiewSelectionStore,
+  useUrlRequestedSearch,
+} from './miew-selection-store';
 import {
   getSelectedAtomsCount,
   getSelectedResidues,
@@ -38,9 +42,11 @@ import {
 import { getEntityFromPickEvent } from '../helpers/miew/entity';
 import { getChainSequences } from '../helpers/miew/sequences';
 import { useMoleculeStructureStore } from './miew-molecule-structure-store';
+import { useSearchStore } from './search-store';
 
 export const useMiewStore = create<MiewStore>((set) => ({
   miew: undefined,
+  miewProxy: undefined,
   error: undefined,
   options: {},
   optionsInitializer: undefined,
@@ -49,6 +55,11 @@ export const useMiewStore = create<MiewStore>((set) => ({
       miew,
       optionsInitializer: (miew.constructor as any)
         .options as MiewOptionsInitializer,
+    }));
+  },
+  setMiewProxy(miewProxy: MiewProxyType | undefined): void {
+    set(() => ({
+      miewProxy,
     }));
   },
   setError(error: string | undefined) {
@@ -198,9 +209,14 @@ export function useSynchronizeMiewBackgroundWithTheme() {
 function useSynchronizedUrlOptions(): void {
   const fromUrl = useMiewStore((state) => state.optionsInitializer?.fromURL);
   const { setOptions } = useMiewStore();
+  const { setUrlSearchRequest } = useSearchStore();
   useEffect(() => {
     if (fromUrl) {
       const options = getMiewOptionsFromUrl(fromUrl);
+      if (options.searchRequest) {
+        setUrlSearchRequest(options.searchRequest);
+        delete options.searchRequest;
+      }
       if (options.load) {
         options.source = options.load;
         setOptions(options);
@@ -211,17 +227,18 @@ function useSynchronizedUrlOptions(): void {
         });
       }
     }
-  }, [fromUrl, getMiewOptionsFromUrl, setOptions]);
+  }, [fromUrl, getMiewOptionsFromUrl, setOptions, setUrlSearchRequest]);
 }
 
 /**
  * Listens Miew events (loading, building representations)
  */
 function useMiewEvents() {
-  const miew = useMiew();
+  const { miew } = useMiewStore();
   const { setData } = useMiewSelectionStore();
   const { changeRepresentations, setSource } = useMiewStore();
   const { setChains } = useMoleculeStructureStore();
+  useUrlRequestedSearch();
   useEffect(() => {
     if (miew) {
       const onMiewLoading = (event: { source: string }) => {
@@ -238,13 +255,22 @@ function useMiewEvents() {
           selectedResidues: getSelectedResidues(miew),
         });
       };
+      const onMiewRepresentationsChanged = () => {
+        setChains(getChainSequences(miew));
+      };
       miew.addEventListener('loading', onMiewLoading);
       miew.addEventListener('buildingDone', onMiewBuildingDone);
       miew.addEventListener('newpick', onMiewPick);
+      miew.addEventListener('repChanged', onMiewRepresentationsChanged);
+      miew.addEventListener('repAdded', onMiewRepresentationsChanged);
+      miew.addEventListener('repRemoved', onMiewRepresentationsChanged);
       return () => {
         miew.removeEventListener('loading', onMiewLoading);
         miew.removeEventListener('buildingDone', onMiewBuildingDone);
         miew.removeEventListener('newpick', onMiewPick);
+        miew.removeEventListener('repChanged', onMiewRepresentationsChanged);
+        miew.removeEventListener('repAdded', onMiewRepresentationsChanged);
+        miew.removeEventListener('repRemoved', onMiewRepresentationsChanged);
       };
     }
     return noop;
@@ -255,8 +281,7 @@ function useMiewEvents() {
  * Applies options set by user via Miewer UI
  */
 function useSynchronizedUserOptions() {
-  const miew = useMiew();
-  const [proxy, setProxy] = useState<MiewProxy | undefined>(undefined);
+  const { miew, miewProxy: proxy, setMiewProxy: setProxy } = useMiewStore();
   useEffect(() => {
     if (miew) {
       const aProxy = new MiewProxy(miew);

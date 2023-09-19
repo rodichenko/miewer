@@ -41,6 +41,18 @@ export function getRepresentationNamesFromEntries(
   };
 }
 
+export function getSearchRequestFromEntries(entries: QueryStringEntry[]): {
+  search: string | undefined;
+  filteredEntries: QueryStringEntry[];
+} {
+  const search = entries.find((o) => /^search$/i.test(o.key));
+  const filteredEntries = entries.filter((o) => !/^search$/i.test(o.key));
+  return {
+    search: search ? search.value : undefined,
+    filteredEntries,
+  };
+}
+
 export function appendRepresentationNamesToEntries(
   entries: QueryStringEntry[],
   names: Array<string | undefined>,
@@ -61,13 +73,17 @@ export function getMiewOptionsFromUrl(
   fromUrl: MiewOptionsFromUrlCallback,
 ): MiewOptionsExtended {
   const entries = getQueryStringEntries();
-  const { names, filteredEntries } = getRepresentationNamesFromEntries(entries);
+  const { names, filteredEntries: filteredAfterNames } =
+    getRepresentationNamesFromEntries(entries);
+  const { search, filteredEntries } =
+    getSearchRequestFromEntries(filteredAfterNames);
   const filteredQuery = getQueryStringFromEntries(
     filterIgnoredKeys(filteredEntries),
     'v',
     representationNameQueryKeyRegExp,
   );
   const options = clonePropertyOptions(fromUrl(filteredQuery));
+  options.searchRequest = search;
   const { reps, ...rest } = options;
   if (reps) {
     for (let r = 0; r < Math.min(reps.length, names.length); r += 1) {

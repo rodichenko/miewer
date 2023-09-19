@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import classNames from 'classnames';
 import type { RepresentationItemProps } from '../../@types/components/representations';
 import { Button } from 'antd';
@@ -33,8 +34,24 @@ function RepresentationItem(props: RepresentationItemProps) {
     changeMaterial,
     changeMode,
     changeNameEvent,
-    changeSelectorEvent,
+    changeSelector,
   } = useChangeRepresentation(representation, repIndex, onEdit ?? noop);
+  const { name, selector, colorer, mode, material } = representation;
+  const [selectorTemp, setSelectorTemp] = useState<string | undefined>(
+    selector,
+  );
+  useEffect(() => {
+    setSelectorTemp(selector);
+  }, [selector, setSelectorTemp]);
+  const onChangeSelectorTemp = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSelectorTemp(event.target.value);
+    },
+    [setSelectorTemp],
+  );
+  const onApplySelector = useCallback(() => {
+    changeSelector(selectorTemp ?? '');
+  }, [changeSelector, selectorTemp]);
   const onRemoveCallback = useCallback(() => {
     if (typeof onRemove === 'function') {
       onRemove(repIndex);
@@ -56,7 +73,6 @@ function RepresentationItem(props: RepresentationItemProps) {
     },
     [onEdit, closeModal],
   );
-  const { name, selector, colorer, mode, material } = representation;
   const placeholder = selector ? `Alias for "${selector}"` : 'Alias';
   return (
     <div
@@ -145,8 +161,10 @@ function RepresentationItem(props: RepresentationItemProps) {
         <Input
           disabled={disabled}
           className="mw-control mw-input-as-text"
-          value={selector}
-          onChange={changeSelectorEvent}
+          value={selectorTemp}
+          onChange={onChangeSelectorTemp}
+          onBlur={onApplySelector}
+          onPressEnter={onApplySelector}
           placeholder="Selector"
         />
       </div>

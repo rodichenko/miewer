@@ -105,8 +105,13 @@ export type ColorerInstance = {
   getResidueColor(residue: Residue, complex: Complex): number;
 };
 
+export type SelectorInstance = {
+  includesAtom?: (atom: Atom) => boolean;
+};
+
 export type RepresentationInstance = {
   colorer: ColorerInstance;
+  selector?: SelectorInstance;
 };
 export type MiewOptionsExtended = MiewOptions & {
   source?: string;
@@ -114,6 +119,12 @@ export type MiewOptionsExtended = MiewOptions & {
   settings?: MiewSettings;
   view?: string;
   preset?: string;
+  searchRequest?: string;
+};
+export type MiewProxy = {
+  busy: boolean;
+  requestOptions(options: MiewOptionsExtended): void;
+  dispose(): void;
 };
 export type MiewOptionsFromUrlCallback = (
   search: string,
@@ -137,13 +148,16 @@ export type SetMiewSourceCallback = (source: string) => void;
 export type SetMiewOptionsCallback = (options: MiewOptionsExtended) => void;
 export type SetMiewBackgroundCallback = (color: MiewerColor) => void;
 export type SetMiewCallback = (miew: Miew) => void;
+export type SetMiewProxyCallback = (miewProxy: MiewProxy | undefined) => void;
 export type SetErrorCallback = (error: string | undefined) => void;
+
 export type CreateRepresentationCallback = (
   representation?: Representation,
 ) => Representation;
 
 export type MiewStoreData = {
   miew: Miew | undefined;
+  miewProxy: MiewProxy | undefined;
   error: string | undefined;
   optionsInitializer: MiewOptionsInitializer | undefined;
   options: MiewOptionsExtended;
@@ -151,6 +165,7 @@ export type MiewStoreData = {
 
 export type MiewStoreActions = {
   setMiew: SetMiewCallback;
+  setMiewProxy: SetMiewProxyCallback;
   setError: SetErrorCallback;
   setSource: SetMiewSourceCallback;
   setOptions: SetMiewOptionsCallback;
@@ -203,6 +218,7 @@ export type ResidueType = {
 
 export type Residue = {
   _index: number;
+  forEachAtom: ItemIterator<Atom>;
   getChain(): Chain;
   getMolecule(): Molecule;
   getType(): ResidueType;
@@ -232,7 +248,6 @@ export type ChainSequence = {
   chain: Chain;
   complex: Complex;
   sequence: SequenceItem[];
-  colorer: ColorerInstance | undefined;
 };
 
 export type Molecule = {
@@ -290,7 +305,9 @@ export type ComplexVisual = {
   forSelectedResidues: ItemIterator<Residue>;
   getSelectionCount(): number;
   getComplex(): Complex;
-  repGet(): RepresentationInstance | undefined;
+  repCount(): number;
+  repGet(index?: number): RepresentationInstance | undefined;
+  repCurrent(index?: number): number;
 };
 
 export type MiewSelectionData = {
@@ -314,6 +331,7 @@ export type MiewSelectionStore = MiewSelectionData & MiewSelectionActions;
 export type MiewMoleculeStructureData = {
   chainNames: string[];
   chains: ChainSequence[];
+  loaded: boolean;
 };
 
 export type MiewMoleculeStructureActions = {

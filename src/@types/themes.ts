@@ -9,6 +9,7 @@ export type PredefinedTheme = Theme & {
   readonly baseBackground: MiewerColor;
   readonly background: MiewerColor;
   readonly foreground: MiewerColor;
+  readonly foregroundFaded: MiewerColor;
   readonly error: MiewerColor;
   readonly fontFamily: string;
   readonly fontSize: number;
