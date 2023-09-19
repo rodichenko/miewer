@@ -1,26 +1,29 @@
 import type { CSSProperties } from 'react';
 import type {
-  ContainerChild,
   ContainerChildSize,
   ContainerDirection,
   ContainerSizes,
   LayoutSize,
   LayoutSizeInfo,
 } from '../../@types/components/layout';
+import { isCssNumberValue, parseCssNumberValue } from '../../helpers/rest';
 
 export function isFixedSize(size?: LayoutSize): boolean {
   return (
     size !== undefined &&
-    (typeof size === 'number' || /^\d+(\.\d+)?px$/.test(size))
+    (typeof size === 'number' || isCssNumberValue(size, 'px'))
   );
 }
 
 export function isPercentSize(size?: LayoutSize): boolean {
-  return typeof size === 'string' && /^\d+(\.\d+)?%/.test(size);
+  return typeof size === 'string' && isCssNumberValue(size, '%');
 }
 
 export function isFlexSize(size?: LayoutSize): boolean {
-  return typeof size === 'string' && /^(\d+(\.\d+)?)?(\*|fr)/.test(size);
+  return (
+    typeof size === 'string' &&
+    (isCssNumberValue(size, '*', '%') || /^(\*|fr)$/i.test(size))
+  );
 }
 
 export function isAutoSize(size?: LayoutSize): boolean {
@@ -45,9 +48,15 @@ export function getSizeValuePart(size: LayoutSize | undefined): number {
   if (typeof size === 'number') {
     return size;
   }
-  const e = /^(\d+(\.\d+)?)?(|px|%|\*|fr)/.exec(size);
-  if (e?.[1]) {
-    return Number(e[1]);
+  if (!Number.isNaN(Number(size))) {
+    return Number(size);
+  }
+  const value = parseCssNumberValue(size, 'px', '%', '*', 'fr');
+  if (value !== undefined) {
+    return value;
+  }
+  if (/^(\*|fr)$/i.test(size)) {
+    return 1;
   }
   if (isFlexSize(size)) {
     return 1;
@@ -66,27 +75,20 @@ export function getFixedSize(
   if (typeof size === 'number') {
     return size;
   }
-  const getFirstRegExpGroup = (r: RegExp): number | undefined => {
-    const e = r.exec(size);
-    if (e?.[1] && !Number.isNaN(Number(e[1]))) {
-      return Number(e[1]);
-    }
-    return undefined;
-  };
   const getValue = (
-    r: RegExp,
+    units: string[],
     fn?: (o: number) => number,
   ): number | undefined => {
-    const value = getFirstRegExpGroup(r);
+    const value = parseCssNumberValue(size, ...units);
     if (value !== undefined) {
       return typeof fn === 'function' ? fn(value) : value;
     }
     return undefined;
   };
   return (
-    getValue(/^(\d+(\.\d+)?)px$/) ??
-    getValue(/^(\d+(\.\d+)?)%$/, (o) => totalSize * (o / 100.0)) ??
-    getValue(/^(\d+(\.\d+)?)(\*|fr)$/, (o) => o * flexBase) ??
+    getValue(['px']) ??
+    getValue(['%'], (o) => totalSize * (o / 100.0)) ??
+    getValue(['*', 'fr'], (o) => o * flexBase) ??
     (size === '*' ? flexBase : 0)
   );
 }

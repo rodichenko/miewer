@@ -1,7 +1,7 @@
-import variables from './index.scss';
 import { stringToColorValue } from '../helpers/colors';
-import type { PredefinedTheme, SystemTheme, Theme } from '../@types/themes';
+import type { PredefinedTheme, SystemTheme } from '../@types/themes';
 import { mapFontSize } from './utilities';
+import variables from './index.scss';
 
 const {
   fontFamily = 'verdana, sans-serif',

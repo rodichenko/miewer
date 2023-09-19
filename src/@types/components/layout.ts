@@ -1,5 +1,12 @@
-import type { ReactNode, ReactElement, Key } from 'react';
-import type { BasicParentComponentProps } from './common';
+import type { MiewerPanel } from './panels';
+import type {
+  ReactNode,
+  ReactElement,
+  Key,
+  ComponentType,
+  CSSProperties,
+} from 'react';
+import type { BasicComponentProps, BasicParentComponentProps } from './common';
 
 export type LayoutSize = 'auto' | string | number;
 
@@ -54,11 +61,6 @@ export type ContainerChildren = ContainerChild | ContainerChild[];
 
 export type ContainerSizes = ContainerChildSize[];
 export type SetContainerSizes = (sizes: ContainerSizes) => void;
-export type PanelProps = CommonLayoutProps & {
-  bordered?: boolean;
-  noPadding?: boolean;
-  transparent?: boolean;
-};
 
 export type ResizerContext = {
   sizes: ContainerSizes;

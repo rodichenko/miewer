@@ -7,21 +7,18 @@ import type { PredefinedTheme } from '../@types/themes';
 import { getThemeConfig, isSystemTheme } from '../themes/utilities';
 import { darkTheme, lightTheme, systemTheme } from '../themes';
 import { useEffect, useMemo } from 'react';
-import { noop } from '../helpers/rest';
+import { noop, createLocalSettings } from '../helpers/rest';
 import { colorValueToString } from '../helpers/colors';
 
 const defaultTheme = darkTheme;
 
-function readThemeFromLocalStorage(): string {
-  return localStorage.getItem('miewer-theme') ?? defaultTheme.id;
-}
-
-function writeThemeToLocalStorage(id: string) {
-  localStorage.setItem('miewer-theme', id);
-}
+const { read, save } = createLocalSettings<string>(
+  'miewer-theme',
+  defaultTheme.id,
+);
 
 const themes = [darkTheme, lightTheme, systemTheme];
-const defaultLocalStorageThemeId: string = readThemeFromLocalStorage();
+const defaultLocalStorageThemeId: string = read();
 const savedTheme =
   themes.find((theme) => theme.id === defaultLocalStorageThemeId) ??
   defaultTheme;
@@ -35,7 +32,7 @@ export const useThemesStore = create<ThemesStore>((set) => ({
       if (typeof theme === 'string') {
         const aTheme = state.themes.find((o) => o.id === theme);
         if (aTheme) {
-          writeThemeToLocalStorage(aTheme.id);
+          save(aTheme.id);
           return {
             theme: aTheme,
             themeConfig: getThemeConfig(aTheme),

@@ -5,6 +5,7 @@ import {
   CodeOutlined,
   EditFilled,
   EditOutlined,
+  FontColorsOutlined,
 } from '@ant-design/icons';
 import React from 'react';
 
@@ -18,5 +19,10 @@ export const miewerPanelIconsSets: Record<MiewerPanel, MiewerPanelIconsSet> = {
     icon: EditOutlined,
     iconOn: EditFilled,
     iconOff: EditOutlined,
+  },
+  [MiewerPanel.sequences]: {
+    icon: FontColorsOutlined,
+    iconOn: FontColorsOutlined,
+    iconOff: FontColorsOutlined,
   },
 };

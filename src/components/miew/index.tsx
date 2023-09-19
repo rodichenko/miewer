@@ -27,7 +27,7 @@ function MiewRenderer(props: BasicComponentProps) {
   }, [setError, setMiew, initializationOptions]);
   return (
     <div className={className} style={style}>
-      <div ref={ref} className="mw-full-size" />
+      <div ref={ref} className="mw-full-size overflow-hidden" />
       {!error && !miew && (
         <div className={classNames('mw-full-size', 'mw-centered')}>
           <span className={classNames('mw-miew-message', 'mw-text-faded')}>

@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $panel-padding: 5px;
 $panel-margin: 1px;
 
@@ -9,9 +11,61 @@ $panel-margin: 1px;
   margin: $panel-margin;
   overflow: auto;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  .mw-panel-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: $panel-padding;
+
+    .mw-panel-title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mw-panel-actions {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+
+      .mw-panel-action,
+      .mw-panel-action-divider {
+        margin-left: 5px;
+        line-height: 1;
+      }
+    }
+  }
+
+  .mw-panel-content {
+    flex: 1;
+    overflow: auto;
+  }
 
   &:not(.mw-panel-no-padding) {
-    padding: $panel-padding;
+    .mw-panel-content {
+      padding: $panel-padding;
+    }
+  }
+}
+
+.mw-panel-action-menu-container {
+  max-height: 60vh;
+  overflow: auto;
+
+  .mw-panel-action-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+
+    .mw-panel-action-menu-item-title {
+      display: inline-flex;
+      align-items: center;
+    }
   }
 }
 
@@ -26,6 +80,13 @@ $panel-margin: 1px;
 
     &.mw-panel-bordered {
       border: 1px solid $border;
+    }
+
+    .mw-panel-header .mw-panel-actions .mw-panel-action-divider {
+      display: inline-flex;
+      width: 1px;
+      align-self: stretch;
+      background-color: color.adjust($foreground, $alpha: -0.75);
     }
   }
 }

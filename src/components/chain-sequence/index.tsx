@@ -5,15 +5,13 @@ import { useMoleculeStructureStore } from '../../stores/miew-molecule-structure-
 import ChainSequenceCanvas from './canvas';
 
 function ChainSequence(props: ChainSequenceProps) {
-  const { chain, className, style, type } = props;
+  const { className, style, ...rest } = props;
+  const { chain } = rest;
   const chainSequence = useMoleculeStructureStore().getChain(chain);
   if (chainSequence) {
     return (
       <div className={classNames('chain-sequence', className)} style={style}>
-        <div>
-          Chain <b>{chainSequence.chain.getName()}</b>
-        </div>
-        <ChainSequenceCanvas chain={chain} type={type} />
+        <ChainSequenceCanvas {...rest} />
       </div>
     );
   }

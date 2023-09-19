@@ -1,11 +1,16 @@
 import type {
   ChainSequence,
   Residue,
-  SequenceItem,
   ResidueSelectionCallback,
+  SequenceItem,
 } from '../../../@types/miew';
 import type { PredefinedTheme } from '../../../@types/themes';
-import { ChainSequenceRenderType } from '../../../@types/components/chain-sequences';
+import type { ChainSequencePointerEventCallback } from '../../../@types/components/chain-sequences';
+import {
+  ChainSequenceAlignment,
+  ChainSequenceEvent,
+  ChainSequenceRenderType,
+} from '../../../@types/components/chain-sequences';
 import { colorValueToString } from '../../../helpers/colors';
 import { getDprValue, getUnDprValue } from '../../../helpers/canvas';
 import type { AnimationAbortCallback } from '../../../@types/rest';
@@ -31,12 +36,14 @@ declare type SelectionSession = {
 const bricksRenderModeThresholdPx = getDprValue(10);
 const sliderInViewportSizeHovered = getDprValue(10);
 const sliderSelectionOffset = getDprValue(2);
-const selectionLineHeight = getDprValue(1);
+const selectionLineWidth = getDprValue(1);
 const sliderInViewportSize = getDprValue(5);
 const sliderOutOfViewportSize = getDprValue(1.0);
-const margin = getDprValue(5.0);
+const sliderTopMargin = getDprValue(4.0);
+const margin = getDprValue(2);
+const sequenceItemHorizontalMargin = getDprValue(2.0);
 const sliderZoneHeight =
-  sliderInViewportSizeHovered + sliderSelectionOffset + selectionLineHeight;
+  sliderInViewportSizeHovered + sliderSelectionOffset + selectionLineWidth;
 
 const animationDurationMs = 100;
 
@@ -47,9 +54,14 @@ class ChainRenderer {
   private _height: number;
   private _bbox: Rect;
   private _renderRequested: boolean;
+  private _reportSelectionRequested: Residue[] | undefined;
   private _chain: ChainSequence | undefined;
   private _position: number; // Position in sequence item coordinate system (i.e. 0 - first item, 1 - second, etc.)
+  private _sliderHeight: number;
   private _renderType: ChainSequenceRenderType;
+  private _useColorer: boolean;
+  private _alignment: ChainSequenceAlignment;
+  private _chainTitleSize: Size;
   private _itemMaxCodeSize: Size;
   private _itemMaxCodeLetterSize: Size;
   private _theme: PredefinedTheme | undefined;
@@ -60,7 +72,10 @@ class ChainRenderer {
   private _selectedResidues: Residue[];
   private _selectedResiduesIndices: Set<number>;
   private _positionAnimationAbort: AnimationAbortCallback | undefined;
+  private _sliderHeightAnimationAbort: AnimationAbortCallback | undefined;
   private _selectionCallback: ResidueSelectionCallback | undefined;
+  private _pointerEventsDisabled: boolean;
+  private _pointerEventCallback: ChainSequencePointerEventCallback | undefined;
 
   constructor() {
     this._theme = undefined;
@@ -68,19 +83,27 @@ class ChainRenderer {
     this._height = 1;
     this._bbox = { width: 1, height: 1, top: 0, left: 0 };
     this._position = 0;
+    this._sliderHeight = sliderInViewportSize;
     this._renderType = ChainSequenceRenderType.letter;
+    this._useColorer = true;
+    this._alignment = ChainSequenceAlignment.left;
     this._renderRaf = 0;
     this._renderRequested = false;
+    this._reportSelectionRequested = undefined;
     this._chain = undefined;
     this._scrollSession = undefined;
     this._selectionSession = undefined;
     this._sliderHovered = false;
     this._sequenceHovered = false;
+    this._chainTitleSize = { width: 1, height: 1 };
     this._itemMaxCodeSize = { width: 1, height: 1 };
     this._itemMaxCodeLetterSize = { width: 1, height: 1 };
     this._selectedResidues = [];
     this._selectedResiduesIndices = new Set<number>();
     this._positionAnimationAbort = undefined;
+    this._sliderHeightAnimationAbort = undefined;
+    this._pointerEventsDisabled = false;
+    this._pointerEventCallback = undefined;
     this.initializeRenderLoop();
   }
 
@@ -92,7 +115,7 @@ class ChainRenderer {
     if (this._chain !== chain) {
       this._chain = chain;
       this.resetPosition(true);
-      this.initializeChainItems();
+      this.calculateTextSizes();
       this.requestRender();
     }
   }
@@ -104,6 +127,29 @@ class ChainRenderer {
   set renderType(renderType: ChainSequenceRenderType) {
     if (this._renderType !== renderType) {
       this._renderType = renderType;
+      this.resetPosition();
+      this.requestRender();
+    }
+  }
+
+  get useColorer(): boolean {
+    return this._useColorer;
+  }
+
+  set useColorer(useColorer: boolean) {
+    if (this._useColorer !== useColorer) {
+      this._useColorer = useColorer;
+      this.requestRender();
+    }
+  }
+
+  get alignment(): ChainSequenceAlignment {
+    return this._alignment;
+  }
+
+  set alignment(alignment: ChainSequenceAlignment) {
+    if (this._alignment !== alignment) {
+      this._alignment = alignment;
       this.resetPosition();
       this.requestRender();
     }
@@ -147,6 +193,41 @@ class ChainRenderer {
     }
   }
 
+  get pointerEventCallback(): ChainSequencePointerEventCallback | undefined {
+    return this._pointerEventCallback;
+  }
+
+  set pointerEventCallback(
+    callback: ChainSequencePointerEventCallback | undefined,
+  ) {
+    if (this._pointerEventCallback !== callback) {
+      this._pointerEventCallback = callback;
+    }
+  }
+
+  get pointerEventsDisabled(): boolean {
+    return this._pointerEventsDisabled;
+  }
+
+  set pointerEventsDisabled(disabled: boolean) {
+    if (this._pointerEventsDisabled !== disabled) {
+      this._pointerEventsDisabled = disabled;
+      this.requestRender();
+    }
+  }
+
+  private get sequenceTitle(): string {
+    const { chain } = this;
+    if (chain) {
+      return `Chain ${chain.chain.getName()}:`;
+    }
+    return '';
+  }
+
+  private get chainItemsStartPx(): number {
+    return this._chainTitleSize.width + sequenceItemHorizontalMargin;
+  }
+
   private get itemSize(): Size {
     switch (this.renderType) {
       case ChainSequenceRenderType.name:
@@ -157,16 +238,15 @@ class ChainRenderer {
     }
   }
 
-  private get itemMargin(): number {
-    return getDprValue(3.0);
-  }
-
   private get itemsCount(): number {
     return this.chain?.sequence.length ?? 0;
   }
 
   private get visibleItemsCount(): number {
-    return this._width / (this.itemSize.width + this.itemMargin);
+    if (this.itemSize.width === 0) {
+      return 0;
+    }
+    return this._width / this.itemSize.width;
   }
 
   private get position(): number {
@@ -195,18 +275,30 @@ class ChainRenderer {
   }
 
   private get sliderHovered(): boolean {
-    return this._sliderHovered;
+    return this._sliderHovered && !this.pointerEventsDisabled;
   }
 
   private set sliderHovered(hovered: boolean) {
     if (this._sliderHovered !== hovered) {
       this._sliderHovered = hovered;
+      this.stopSliderHeightAnimation();
+      this._sliderHeightAnimationAbort = animate(
+        {
+          from: this._sliderHeight,
+          to: hovered ? sliderInViewportSizeHovered : sliderInViewportSize,
+          durationMs: animationDurationMs / 2.0,
+        },
+        (value: number) => {
+          this._sliderHeight = value;
+          this.requestRender();
+        },
+      );
       this.requestRender();
     }
   }
 
   private get sequenceHovered(): boolean {
-    return this._sequenceHovered;
+    return this._sequenceHovered && !this.pointerEventsDisabled;
   }
 
   private set sequenceHovered(hovered: boolean) {
@@ -245,9 +337,7 @@ class ChainRenderer {
     if (!chain || chain.sequence.length === 0 || !this.sliderVisible) {
       return 0;
     }
-    return this.sliderHovered
-      ? sliderInViewportSizeHovered
-      : sliderInViewportSize;
+    return this._sliderHeight;
   }
 
   private get sliderCenter(): number {
@@ -260,7 +350,10 @@ class ChainRenderer {
 
   private get sliderVerticalPosition(): number {
     return Math.floor(
-      this.itemSize.height + 2.0 * margin + sliderInViewportSizeHovered / 2.0,
+      margin +
+        this.itemSize.height +
+        sliderTopMargin +
+        sliderInViewportSizeHovered / 2.0,
     );
   }
 
@@ -277,7 +370,11 @@ class ChainRenderer {
       top: this._bbox.top,
       left: this._bbox.left,
       width: this._bbox.width,
-      height: getUnDprValue(2.0 * margin + this.itemSize.height),
+      height: getUnDprValue(
+        margin +
+          this.itemSize.height +
+          (this.sliderVisible ? sliderTopMargin : margin),
+      ),
     };
   }
 
@@ -310,8 +407,11 @@ class ChainRenderer {
       this.detachListeners();
       this.stopAnimations();
       this._canvas = canvas;
+      if (this._canvas) {
+        this._canvas.style.height = `${getDprValue(1)}px`;
+      }
       this.attachListeners();
-      this.initializeChainItems();
+      this.calculateTextSizes();
       this.requestRender();
     }
   }
@@ -326,7 +426,15 @@ class ChainRenderer {
   private correctPosition(position: number): number {
     const { visibleItemsCount, itemsCount } = this;
     if (visibleItemsCount >= itemsCount) {
-      return (itemsCount - visibleItemsCount) / 2.0;
+      switch (this.alignment) {
+        case ChainSequenceAlignment.center:
+          return (itemsCount - visibleItemsCount) / 2.0;
+        case ChainSequenceAlignment.right:
+          return itemsCount - visibleItemsCount;
+        case ChainSequenceAlignment.left:
+        default:
+          return 0;
+      }
     }
     const max = itemsCount - visibleItemsCount;
     const min = Math.max(0, (visibleItemsCount - itemsCount) / 2.0);
@@ -363,7 +471,11 @@ class ChainRenderer {
     let height: number | undefined;
     const callback = () => {
       const desiredHeight = Math.ceil(
-        getUnDprValue(this.itemSize.height + 2.0 * margin + sliderZoneHeight),
+        getUnDprValue(
+          this.itemSize.height +
+            2.0 * margin +
+            (this.sliderVisible ? sliderZoneHeight + sliderTopMargin : 0),
+        ),
       );
       if (this._canvas && desiredHeight !== this._canvas.clientHeight) {
         this._canvas.style.height = `${desiredHeight}px`;
@@ -389,6 +501,10 @@ class ChainRenderer {
         this._renderRequested = false;
         this.render();
       }
+      if (this._reportSelectionRequested) {
+        this.reportSelectionChanged(this._reportSelectionRequested);
+        this._reportSelectionRequested = undefined;
+      }
       this._renderRaf = requestAnimationFrame(callback);
     };
     callback();
@@ -411,9 +527,11 @@ class ChainRenderer {
   private getSequencePositionForMouseEvent(event: MouseEvent) {
     const { clientX } = event;
     const { left } = this._bbox;
-    const x = getDprValue(clientX - left);
-    const itemSize = this.itemSize.width + this.itemMargin;
-    return this.position + x / itemSize;
+    const x = getDprValue(clientX - left) - this.chainItemsStartPx;
+    if (this.itemSize.width === 0) {
+      return 0;
+    }
+    return this.position + x / this.itemSize.width;
   }
 
   private getSliderPositionForMouseEvent(event: MouseEvent) {
@@ -458,6 +576,17 @@ class ChainRenderer {
     return [];
   }
 
+  private reportPointerEvent(event: ChainSequenceEvent): void {
+    const { chain } = this;
+    if (
+      chain &&
+      !this.pointerEventsDisabled &&
+      typeof this._pointerEventCallback === 'function'
+    ) {
+      this._pointerEventCallback(chain.chain, event);
+    }
+  }
+
   private reportSelectionChanged(newSelection: Residue[]): void {
     if (typeof this._selectionCallback === 'function') {
       this._selectionCallback(newSelection);
@@ -466,11 +595,17 @@ class ChainRenderer {
 
   private stopAnimations(): void {
     this.stopPositionAnimation();
+    this.stopSliderHeightAnimation();
   }
 
   private stopPositionAnimation(): void {
     stopAnimation(this._positionAnimationAbort);
     this._positionAnimationAbort = undefined;
+  }
+
+  private stopSliderHeightAnimation(): void {
+    stopAnimation(this._sliderHeightAnimationAbort);
+    this._sliderHeightAnimationAbort = undefined;
   }
 
   private mouseEventUnderBoundingBox(event: MouseEvent, bbox: Rect): boolean {
@@ -508,40 +643,49 @@ class ChainRenderer {
         (a, b) => a - b,
       );
       if (!arraysEquals(hash, newHash)) {
-        this.reportSelectionChanged(selected);
+        this._reportSelectionRequested = selected;
       }
       session.lastSelection = items;
     }
   }
 
+  private updateHoveredStatesForEvent(event: MouseEvent): void {
+    this.sliderHovered =
+      event.target === this._canvas &&
+      this.mouseEventUnderBoundingBox(event, this.sliderOuterBoundingBox);
+    this.sequenceHovered =
+      event.target === this._canvas &&
+      this.mouseEventUnderBoundingBox(event, this.sequenceBoundingBox);
+  }
+
   private readonly mouseMove = (event: MouseEvent): void => {
+    if (this.pointerEventsDisabled) {
+      return;
+    }
     if (this._scrollSession) {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
       this.sliderHovered = true;
       const diff =
         this.getSliderPositionForMouseEvent(event) -
         this._scrollSession.touchPosition;
       this.position = this._scrollSession.sliderInitialPosition + diff;
+      this.reportPointerEvent(ChainSequenceEvent.scroll);
     } else if (this._selectionSession) {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
       this.sequenceHovered = true;
       this.handleSelectionEvent(event);
+      this.reportPointerEvent(ChainSequenceEvent.selection);
     } else {
-      this.sliderHovered = this.mouseEventUnderBoundingBox(
-        event,
-        this.sliderOuterBoundingBox,
-      );
-      this.sequenceHovered = this.mouseEventUnderBoundingBox(
-        event,
-        this.sequenceBoundingBox,
-      );
+      this.updateHoveredStatesForEvent(event);
     }
   };
 
   private readonly mouseDown = (event: MouseEvent): void => {
-    if (event.button !== 0) {
+    if (event.button !== 0 || this.pointerEventsDisabled) {
       return;
     }
     const sliderOuter = this.mouseEventUnderBoundingBox(
@@ -557,14 +701,17 @@ class ChainRenderer {
       this.sequenceBoundingBox,
     );
     if (!sliderInner && sliderOuter) {
-      event.stopPropagation();
       event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
       this.center = this.getSliderPositionForMouseEvent(event);
       return;
     }
     if (sliderInner) {
+      this.reportPointerEvent(ChainSequenceEvent.scrollStart);
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
       this._scrollSession = {
         sliderInitialPosition: this.position,
         touchPosition: this.getSliderPositionForMouseEvent(event),
@@ -572,8 +719,10 @@ class ChainRenderer {
       return;
     }
     if (sequence) {
+      this.reportPointerEvent(ChainSequenceEvent.selectionStart);
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation();
       this._selectionSession = {
         touchPosition: this.getSequencePositionForMouseEvent(event),
         append: event.shiftKey && !event.altKey,
@@ -586,31 +735,37 @@ class ChainRenderer {
   };
 
   private readonly mouseUp = (event: MouseEvent): void => {
-    if (this._scrollSession !== undefined) {
+    if (!this.pointerEventsDisabled && this._scrollSession !== undefined) {
       this.mouseMove(event);
-      this._scrollSession = undefined;
+      this.reportPointerEvent(ChainSequenceEvent.scrollFinish);
       this.requestRender();
     }
-    if (this._selectionSession !== undefined) {
+    if (!this.pointerEventsDisabled && this._selectionSession !== undefined) {
       this.mouseMove(event);
-      this._selectionSession = undefined;
+      this.reportPointerEvent(ChainSequenceEvent.selectionFinish);
       this.requestRender();
     }
+    this._selectionSession = undefined;
+    this._scrollSession = undefined;
+    this.updateHoveredStatesForEvent(event);
   };
 
-  private initializeChainItems() {
+  private calculateTextSizes() {
     const { chain } = this;
     if (this._canvas && chain) {
       const ctx = this._canvas.getContext('2d');
       if (ctx) {
+        ctx.save();
+        ctx.textBaseline = 'alphabetic';
         this.applyTheme(ctx);
         const measureText = (text: string): Size => {
-          let { width, fontBoundingBoxAscent, fontBoundingBoxDescent } =
-            ctx.measureText(text);
-          width = Math.ceil(width);
-          const height = fontBoundingBoxAscent + fontBoundingBoxDescent;
-          return { width, height };
+          const { width, fontBoundingBoxAscent } = ctx.measureText(text);
+          return {
+            width: Math.ceil(width),
+            height: fontBoundingBoxAscent,
+          };
         };
+        this._chainTitleSize = measureText(this.sequenceTitle);
         this._itemMaxCodeSize = { width: 0, height: 0 };
         this._itemMaxCodeLetterSize = { width: 0, height: 0 };
         chain.sequence.forEach((item) => {
@@ -633,6 +788,9 @@ class ChainRenderer {
             letterCodeSize.height,
           );
         });
+        this._itemMaxCodeSize.width += sequenceItemHorizontalMargin;
+        this._itemMaxCodeLetterSize.width += sequenceItemHorizontalMargin;
+        ctx.restore();
       }
       this.resetPosition();
       this.requestRender();
@@ -653,32 +811,12 @@ class ChainRenderer {
     }
   }
 
-  private getSequenceItemPositionByIndex(index: number): {
-    x: number;
-    y: number;
-  } {
+  private getSequenceItemPositionByIndex(index: number): number {
     if (index >= 0) {
-      const { width = 0, height = 0 } = this.itemSize;
-      const x =
-        (width + this.itemMargin) * (index - this.position) + width / 2.0;
-      return {
-        x,
-        y: height + margin,
-      };
+      const { width = 0 } = this.itemSize;
+      return this.chainItemsStartPx + width * (index + 0.5 - this.position);
     }
-    return {
-      x: 0,
-      y: margin,
-    };
-  }
-
-  private getSequenceItemPosition(item: SequenceItem): {
-    x: number;
-    y: number;
-  } {
-    return this.getSequenceItemPositionByIndex(
-      this.chain?.sequence?.indexOf(item) ?? -1,
-    );
+    return this.chainItemsStartPx;
   }
 
   private renderSlider(ctx: CanvasRenderingContext2D): void {
@@ -689,7 +827,12 @@ class ChainRenderer {
       sliderRange,
       sliderRatio,
       sliderVerticalPosition,
+      theme,
     } = this;
+    const { foreground, selectionBackground } = theme ?? {
+      foreground: 0xfafafa,
+      selectionBackground: 0xe78d04,
+    };
     if (
       chain &&
       chain.sequence.length > 0 &&
@@ -739,44 +882,53 @@ class ChainRenderer {
         sliderHeight,
       );
       ctx.moveTo(0, y);
-      ctx.rect(0, selectionY, this._width, selectionLineHeight);
+      ctx.rect(
+        0,
+        selectionY - selectionLineWidth,
+        this._width,
+        selectionLineWidth * 2.0,
+      );
       ctx.clip();
       chain.sequence.forEach((item, index) => {
-        if (item.colorer) {
-          ctx.save();
-          ctx.fillStyle = colorValueToString(
-            item.colorer.getResidueColor(item.residue, item.complex),
+        const color =
+          !this.useColorer || !item.colorer
+            ? colorValueToString(foreground)
+            : colorValueToString(
+                item.colorer.getResidueColor(item.residue, item.complex),
+              );
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        if (dx > bricksRenderModeThresholdPx) {
+          // Blocks greater than `bricksRenderModeThresholdPx`
+          // we should render as "bricks"
+          ctx.rect(
+            index * dx,
+            Math.floor(y - sliderHeight / 2.0),
+            dx - 2,
+            sliderHeight,
           );
+        } else {
+          ctx.rect(
+            index * dx,
+            Math.floor(y - sliderHeight / 2.0),
+            dx,
+            sliderHeight,
+          );
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+        if (this.residueIsSelected(item.residue)) {
+          ctx.save();
           ctx.beginPath();
-          if (dx > bricksRenderModeThresholdPx) {
-            // Blocks greater than `bricksRenderModeThresholdPx`
-            // we should render as "bricks"
-            ctx.rect(
-              index * dx,
-              Math.floor(y - sliderHeight / 2.0),
-              dx - 2,
-              sliderHeight,
-            );
-          } else {
-            ctx.rect(
-              index * dx,
-              Math.floor(y - sliderHeight / 2.0),
-              dx,
-              sliderHeight,
-            );
-          }
+          ctx.lineWidth = selectionLineWidth;
+          ctx.moveTo(index * dx, selectionY - selectionLineWidth / 2.0);
+          ctx.lineTo((index + 1) * dx, selectionY - selectionLineWidth / 2.0);
           ctx.closePath();
-          ctx.fill();
+          ctx.strokeStyle = colorValueToString(selectionBackground);
+          ctx.stroke();
           ctx.restore();
-          if (this.residueIsSelected(item.residue) && this._theme) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(index * dx, selectionY, dx, selectionLineHeight);
-            ctx.closePath();
-            ctx.fillStyle = colorValueToString(this._theme.selectionBackground);
-            ctx.fill();
-            ctx.restore();
-          }
         }
       });
       ctx.restore();
@@ -800,49 +952,91 @@ class ChainRenderer {
     ctx.clearRect(0, 0, this._width, this._height);
     this.applyTheme(ctx);
 
-    const { chain, position, visibleItemsCount, itemSize, itemMargin } = this;
+    const { chain, position, visibleItemsCount, itemSize, theme } = this;
+    const { foreground, selectionBackground } = theme ?? {
+      foreground: 0xfafafa,
+      selectionBackground: 0xe78d04,
+    };
     if (chain && chain.sequence.length > 0) {
-      ctx.textBaseline = 'bottom';
+      ctx.textBaseline = 'alphabetic';
       ctx.textAlign = 'center';
       ctx.save();
-      const size = itemSize.width + itemMargin;
+      const size = itemSize.width;
+      const textPosition = margin + itemSize.height - getDprValue(1);
+      const selectionOffset = Math.floor(
+        Math.min(
+          margin - getDprValue(1),
+          sliderTopMargin - getDprValue(1),
+          getDprValue(2),
+        ),
+      );
+      ctx.save();
+      ctx.textAlign = 'left';
+      ctx.fillStyle = colorValueToString(foreground);
+      ctx.fillText(this.sequenceTitle, 0, textPosition);
+      ctx.restore();
+      ctx.beginPath();
+      ctx.rect(
+        this.chainItemsStartPx,
+        0,
+        this._width - this.chainItemsStartPx,
+        this._height,
+      );
+      ctx.clip();
       chain.sequence.forEach((item, index) => {
         const partiallyInViewport =
           index >= position - 1 && index <= position + visibleItemsCount;
-        if (item.colorer && partiallyInViewport) {
-          const { x: tx, y: ty } = this.getSequenceItemPositionByIndex(index);
+        const color =
+          !this.useColorer || !item.colorer
+            ? colorValueToString(foreground)
+            : colorValueToString(
+                item.colorer.getResidueColor(item.residue, item.complex),
+              );
+        if (partiallyInViewport) {
+          const tx = this.getSequenceItemPositionByIndex(index);
           if (this._theme && this.residueIsSelected(item.residue)) {
             ctx.save();
-            ctx.fillStyle = colorValueToString(
-              this._theme.selectionBackground,
-              0.25,
-            );
+            ctx.fillStyle = colorValueToString(selectionBackground, 0.25);
             ctx.beginPath();
             ctx.rect(
               tx - size / 2.0,
-              Math.floor(ty - itemSize.height - 1),
+              margin - selectionOffset,
               size,
-              itemSize.height + 1,
+              itemSize.height + 2 * selectionOffset,
             );
             ctx.closePath();
             ctx.fill();
-            ctx.fillStyle = colorValueToString(this._theme.selectionBackground);
+            ctx.strokeStyle = colorValueToString(selectionBackground);
             ctx.beginPath();
-            ctx.rect(
+            ctx.lineWidth = selectionLineWidth;
+            ctx.moveTo(
               tx - size / 2.0,
-              Math.floor(ty - itemSize.height - 1),
-              size,
-              getDprValue(1),
+              margin - selectionOffset + selectionLineWidth / 2.0,
             );
-            ctx.rect(tx - size / 2.0, Math.ceil(ty + 1), size, getDprValue(1));
+            ctx.lineTo(
+              tx + size / 2.0,
+              margin - selectionOffset + selectionLineWidth / 2.0,
+            );
+            ctx.moveTo(
+              tx - size / 2.0,
+              margin +
+                itemSize.height +
+                selectionOffset +
+                selectionLineWidth / 2.0,
+            );
+            ctx.lineTo(
+              tx + size / 2.0,
+              margin +
+                itemSize.height +
+                selectionOffset +
+                selectionLineWidth / 2.0,
+            );
             ctx.closePath();
-            ctx.fill();
+            ctx.stroke();
             ctx.restore();
           }
-          ctx.fillStyle = colorValueToString(
-            item.colorer.getResidueColor(item.residue, item.complex),
-          );
-          ctx.fillText(this.getItemText(item), tx, ty);
+          ctx.fillStyle = color;
+          ctx.fillText(this.getItemText(item), tx, textPosition);
         }
       });
       ctx.restore();

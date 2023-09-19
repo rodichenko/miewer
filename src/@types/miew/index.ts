@@ -138,7 +138,9 @@ export type SetMiewOptionsCallback = (options: MiewOptionsExtended) => void;
 export type SetMiewBackgroundCallback = (color: MiewerColor) => void;
 export type SetMiewCallback = (miew: Miew) => void;
 export type SetErrorCallback = (error: string | undefined) => void;
-export type CreateRepresentationCallback = () => Representation;
+export type CreateRepresentationCallback = (
+  representation?: Representation,
+) => Representation;
 
 export type MiewStoreData = {
   miew: Miew | undefined;

@@ -2,8 +2,10 @@
   user-select: none;
 
   .mw-chain-sequence-canvas {
+    margin: 0;
     width: 100%;
     overflow: hidden;
     min-height: 1px;
+    height: 1px;
   }
 }

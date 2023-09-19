@@ -53,9 +53,6 @@ function Terminal(props: BasicComponentProps) {
   }, [terminal, miew]);
   const errors: string[] = useMemo(() => {
     const result = [];
-    if (!miew) {
-      result.push('Miew is not initialized');
-    }
     if (error) {
       result.push(error);
     }

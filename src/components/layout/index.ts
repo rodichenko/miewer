@@ -1,5 +1,6 @@
-import Container from './container';
+import Container, { SpaceContainer } from './container';
 import Panel from './panel';
+import MiewerPanel from './miewer-panel';
 import SplitContainer from './split-container';
 
-export { Container, Panel, SplitContainer };
+export { Container, MiewerPanel, Panel, SpaceContainer, SplitContainer };

@@ -2,34 +2,27 @@ import { useCallback } from 'react';
 import { create } from 'zustand';
 import type { MiewerPanelsStore } from '../@types/components/panels';
 import { MiewerPanel } from '../@types/components/panels';
+import { createLocalSettings } from '../helpers/rest';
 
-export const useMiewerPanelsStore = create<MiewerPanelsStore>((set) => ({
-  panels: new Set<MiewerPanel>([MiewerPanel.representations]),
+const { read, save } = createLocalSettings<MiewerPanel[]>('miewer-panels', [
+  MiewerPanel.representations,
+  MiewerPanel.sequences,
+]);
+
+export const useMiewerPanelsStore = create<MiewerPanelsStore>((set, get) => ({
+  panels: new Set<MiewerPanel>(read()),
   setPanelVisible(panel: MiewerPanel, visible?: boolean): void {
-    set((store) => ({
-      panels: new Set<MiewerPanel>(
-        [...store.panels]
-          .filter((p) => p !== panel)
-          .concat(visible === undefined || visible ? [panel] : []),
-      ),
-    }));
+    const panels = new Set<MiewerPanel>(
+      [...get().panels]
+        .filter((p) => p !== panel)
+        .concat(visible === undefined || visible ? [panel] : []),
+    );
+    save([...panels]);
+    set({ panels });
   },
   togglePanel(panel: MiewerPanel): void {
-    set((store) => {
-      const visible = store.panels.has(panel);
-      if (visible) {
-        // Hide panel
-        return {
-          panels: new Set<MiewerPanel>(
-            [...store.panels].filter((p) => p !== panel),
-          ),
-        };
-      }
-      // Show panel
-      return {
-        panels: new Set<MiewerPanel>([...store.panels].concat(panel)),
-      };
-    });
+    const visible = get().panels.has(panel);
+    get().setPanelVisible(panel, !visible);
   },
 }));
 
@@ -52,10 +45,11 @@ export function useTogglePanel(panel: MiewerPanel): () => void {
   }, [togglePanel, panel]);
 }
 
-export function useToggleTerminal(): () => void {
-  return useTogglePanel(MiewerPanel.terminal);
-}
-
-export function useToggleRepresentations(): () => void {
-  return useTogglePanel(MiewerPanel.representations);
+export function useClosePanel(panel: MiewerPanel): () => void {
+  const setPanelVisible = useMiewerPanelsStore(
+    (store) => store.setPanelVisible,
+  );
+  return useCallback((): void => {
+    setPanelVisible(panel, false);
+  }, [setPanelVisible, panel]);
 }

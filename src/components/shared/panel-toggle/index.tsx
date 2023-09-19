@@ -1,8 +1,10 @@
 import React from 'react';
-import type { ComponentType } from 'react';
 import { Button } from 'antd';
 import type { PanelToggleProps } from '../../../@types/components/panels';
-import { miewerPanelNames } from '../../../@types/components/panels';
+import {
+  miewerPanelNames,
+  miewerPanelShortNames,
+} from '../../../@types/components/panels';
 import {
   usePanelVisible,
   useTogglePanel,
@@ -23,7 +25,13 @@ function PanelToggle(props: PanelToggleProps) {
       onClick={toggle}>
       {<IconChild className="mw-panel-toggle-icon" />}
       {displayName && IconChild ? ' ' : null}
-      {displayName && <span>{miewerPanelNames[panel]}</span>}
+      {displayName && (
+        <span>
+          {displayName === 'short'
+            ? miewerPanelShortNames[panel]
+            : miewerPanelNames[panel]}
+        </span>
+      )}
     </Button>
   );
 }

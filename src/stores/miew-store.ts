@@ -21,7 +21,6 @@ import { useThemeConfig } from './themes-store';
 import {
   cloneRepresentation,
   getMiewRepresentations,
-  getRepresentationHash,
   createDefaultRepresentation,
 } from '../helpers/miew/representations';
 import { clonePropertyOptions } from '../helpers/miew/property-options';
@@ -121,8 +120,7 @@ export const useMiewStore = create<MiewStore>((set) => ({
           if (
             current[c] &&
             result[c] &&
-            getRepresentationHash(current[c]) ===
-              getRepresentationHash(result[c])
+            current[c].selector === result[c].selector
           ) {
             result[c].name = current[c].name;
           } else {
@@ -173,11 +171,14 @@ export function useRemoveMiewRepresentation(): RemoveRepresentationCallback {
 
 export function useCreateMiewRepresentation(): CreateRepresentationCallback {
   const callback = useAddMiewRepresentation();
-  return useCallback((): Representation => {
-    const newRepresentation = createDefaultRepresentation();
-    callback(newRepresentation);
-    return newRepresentation;
-  }, [callback]);
+  return useCallback(
+    (representation?: Representation): Representation => {
+      const newRepresentation = representation ?? createDefaultRepresentation();
+      callback(newRepresentation);
+      return newRepresentation;
+    },
+    [callback],
+  );
 }
 
 /**

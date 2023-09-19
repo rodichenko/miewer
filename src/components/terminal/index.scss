@@ -1,3 +1,7 @@
+.mw-terminal-title {
+  padding-left: 5px;
+}
+
 .mw-miewer-terminal-container {
   position: relative;
 
@@ -14,9 +18,9 @@
   }
 }
 
-@mixin miewer-terminal($background, $foreground, $error) {
+@mixin miewer-terminal($foreground, $error) {
   .mw-miewer-terminal.terminal {
-    --background: #{$background};
+    --background: transparent;
     --color: #{$foreground};
     --error-color: #{$error};
   }

@@ -1,4 +1,4 @@
-import type { QueryStringEntry } from '../@types/rest';
+import type { LocalSettings, QueryStringEntry } from '../@types/rest';
 
 export function noop(): any {
   // Noop
@@ -238,4 +238,62 @@ export function getRangesFromNumberArray(
     }
   }
   return result;
+}
+
+export function getCssNumberValueRegExp(...unit: string[]): RegExp {
+  return new RegExp(
+    `^(\\d+(\\.\\d+)?)(${unit.map((u) => escapeRegExp(u)).join('|')})?$`,
+    'i',
+  );
+}
+
+export function isCssNumberValue(cssValue: string, ...unit: string[]): boolean {
+  const regExp = getCssNumberValueRegExp(...unit);
+  return regExp.test(cssValue);
+}
+
+export function parseCssNumberValue(
+  cssValue: string,
+  ...unit: string[]
+): number | undefined {
+  const regExp = getCssNumberValueRegExp(...unit);
+  const [, valueString] = regExp.exec(cssValue) ?? [];
+  if (valueString && !Number.isNaN(Number(valueString))) {
+    return Number(valueString);
+  }
+  return undefined;
+}
+
+export function readSetting<T>(setting: string, defaultValue: T): T {
+  try {
+    const value = localStorage.getItem(setting);
+    if (!value || value.trim() === '') {
+      return defaultValue;
+    }
+    return JSON.parse(value) as T;
+  } catch (noopError) {
+    // Noop
+  }
+  return defaultValue;
+}
+
+export function saveSetting<T>(setting: string, value: T | undefined): void {
+  localStorage.setItem(
+    setting,
+    value === undefined ? '' : JSON.stringify(value),
+  );
+}
+
+export function createLocalSettings<T>(
+  settings: string,
+  defaultValue: T,
+): LocalSettings<T> {
+  const read = () => readSetting(settings, defaultValue);
+  const save = (value: T | undefined): void => {
+    saveSetting(settings, value);
+  };
+  return {
+    read,
+    save,
+  };
 }
