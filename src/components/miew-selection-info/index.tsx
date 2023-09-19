@@ -48,7 +48,12 @@ function MiewSelectionInfo(props: BasicComponentProps) {
   if (lastPickDescription) {
     return (
       <div
-        className={classNames(className, 'mw-panel', 'mw-miew-selection-info')}
+        className={classNames(
+          className,
+          'mw-panel',
+          'content',
+          'mw-miew-selection-info',
+        )}
         style={style}>
         {lastPickDescription}
       </div>

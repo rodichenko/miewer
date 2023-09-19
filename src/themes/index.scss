@@ -1,24 +1,28 @@
+@use 'sass:color';
 @import '../components';
 
 $font-family: verdana, sans-serif;
 $font-size: 11px;
+$dark-background-base: #000;
 $dark-background: #222;
-$dark-background-accent: #111;
-$dark-background-faded: #2f2f2f;
+$dark-background-header: color.adjust(#111, $alpha: -0.1);
+$dark-background-panel: color.adjust(#111, $alpha: -0.2);
+$dark-background-even-item: color.adjust(#222, $alpha: -0.5);
 $dark-foreground: #cacaca;
 $dark-foreground-faded: #777;
-$dark-foreground-accent: #eee;
+$dark-border: $dark-background;
 $dark-error: #d13460;
 $dark-error-faded: #7a243d;
-$dark-miew-background: $dark-background;
 $dark-selection-background: #e78d04;
 $dark-selection-foreground: #222;
-$light-background: #f0f0f0;
-$light-background-accent: #fafafa;
-$light-background-faded: #e0e0e0;
+$light-background-base: #f0f0f0;
+$light-background: #ededed;
+$light-background-header: color.adjust(#e0e0e0, $alpha: -0.1);
+$light-background-panel: color.adjust(#f0f0f0, $alpha: -0.2);
+$light-background-even-item: color.adjust(#e0e0e0, $alpha: -0.5);
 $light-foreground: #333;
 $light-foreground-faded: #777;
-$light-foreground-accent: #111;
+$light-border: #d0d0d0;
 $light-error: #d90f45;
 $light-error-faded: #ef5c83;
 $light-miew-background: $light-background;
@@ -28,11 +32,12 @@ $light-selection-foreground: #222;
 @mixin dark-theme {
   @include components(
     $background: $dark-background,
-    $background-accent: $dark-background-accent,
-    $background-faded: $dark-background-faded,
+    $background-header: $dark-background-header,
+    $background-panel: $dark-background-panel,
+    $background-even-item: $dark-background-even-item,
     $foreground: $dark-foreground,
     $foreground-faded: $dark-foreground-faded,
-    $foreground-accent: $dark-foreground-accent,
+    $border: $dark-border,
     $error: $dark-error,
     $error-faded: $dark-error-faded
   );
@@ -41,11 +46,12 @@ $light-selection-foreground: #222;
 @mixin light-theme {
   @include components(
     $background: $light-background,
-    $background-accent: $light-background-accent,
-    $background-faded: $light-background-faded,
+    $background-header: $light-background-header,
+    $background-panel: $light-background-panel,
+    $background-even-item: $light-background-even-item,
     $foreground: $light-foreground,
     $foreground-faded: $light-foreground-faded,
-    $foreground-accent: $light-foreground-accent,
+    $border: $light-border,
     $error: $light-error,
     $error-faded: $light-error-faded
   );
@@ -76,11 +82,13 @@ body {
 :export {
   fontFamily: $font-family;
   fontSize: $font-size;
+  darkBackgroundBase: $dark-background-base;
   darkBackground: $dark-background;
   darkForeground: $dark-foreground;
   darkError: $dark-error;
   darkSelectionBackground: $dark-selection-background;
   darkSelectionForeground: $dark-selection-foreground;
+  lightBackgroundBase: $light-background-base;
   lightBackground: $light-miew-background;
   lightForeground: $light-foreground;
   lightError: $light-error;

@@ -4,6 +4,7 @@
 
 @mixin layout(
   $panel-background,
+  $panel-header,
   $panel-foreground,
   $border,
   $split-divider,
@@ -12,6 +13,7 @@
   @include panel(
     $background: $panel-background,
     $foreground: $panel-foreground,
+    $header: $panel-header,
     $border: $border
   );
   @include split-divider(

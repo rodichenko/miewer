@@ -6,12 +6,14 @@ import variables from './index.scss';
 const {
   fontFamily = 'verdana, sans-serif',
   fontSize = 11,
+  darkBackgroundBase = '#111',
   darkBackground = '#222',
   darkForeground = '#cacaca',
   darkError = '#d13460',
   darkSelectionBackground = '#e78d04',
   darkSelectionForeground = '#222',
-  lightBackground = '#f0f0f0',
+  lightBackgroundBase = '#e0e0e0',
+  lightBackground = '#ededed',
   lightForeground = '#333',
   lightError = '#d90f45',
   lightSelectionBackground = '#e78d04',
@@ -21,6 +23,7 @@ const {
 export const darkTheme: PredefinedTheme = {
   id: 'dark-theme',
   title: 'Dark theme',
+  baseBackground: stringToColorValue(darkBackgroundBase),
   background: stringToColorValue(darkBackground),
   foreground: stringToColorValue(darkForeground),
   selectionBackground: stringToColorValue(darkSelectionBackground),
@@ -33,6 +36,7 @@ export const darkTheme: PredefinedTheme = {
 export const lightTheme: PredefinedTheme = {
   id: 'light-theme',
   title: 'Light theme',
+  baseBackground: stringToColorValue(lightBackgroundBase),
   background: stringToColorValue(lightBackground),
   foreground: stringToColorValue(lightForeground),
   selectionBackground: stringToColorValue(lightSelectionBackground),

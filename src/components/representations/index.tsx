@@ -14,7 +14,9 @@ function RepresentationsList(props: BasicComponentProps) {
   const removeRep = useRemoveMiewRepresentation();
   const reps = useMiewRepresentations();
   return (
-    <div className={classNames(className, 'mw-representations')} style={style}>
+    <div
+      className={classNames(className, 'mw-representations', 'mw-list')}
+      style={style}>
       {reps.map((representation, idx) => (
         <RepresentationItem
           key={`rep-${idx}`}

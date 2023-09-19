@@ -136,20 +136,19 @@ body {
 
 @mixin components(
   $background,
-  $background-accent,
-  $background-faded,
+  $background-header,
+  $background-panel,
+  $background-even-item,
   $foreground,
   $foreground-faded,
-  $foreground-accent,
+  $border,
   $error,
   $error-faded
 ) {
-  $panel-background: color.adjust($background-accent, $alpha: -0.1);
-  $panel-border: $background-accent;
+  $panel-background: color.adjust($background, $alpha: -0.1);
+  $panel-border: $border;
   $split-panel-divider: transparent;
   $split-panel-divider-hover: color.adjust($foreground, $alpha: -0.75);
-  $header: color.adjust($background-accent, $alpha: -0.1);
-  $header-shadow: color.adjust($background-accent, $alpha: -0.8);
   $divider: color.adjust($foreground, $alpha: -0.75);
 
   .mw-text-faded {
@@ -165,7 +164,7 @@ body {
   }
 
   .mw-list .mw-list-item:nth-child(even) {
-    background-color: color.adjust($background-faded, $alpha: -0.25);
+    background-color: $background-even-item;
   }
 
   .mw-input-as-text {
@@ -175,10 +174,11 @@ body {
     }
   }
 
-  @include miewer($background, $foreground, $header, $header-shadow);
-  @include miew($background, $foreground, $panel-background, $panel-border);
+  @include miewer($background, $foreground, $background-header, $border);
+  @include miew($background, $foreground, $background-panel, $panel-border);
   @include layout(
-    $panel-background,
+    $background-panel,
+    $background-header,
     $foreground,
     $panel-border,
     $split-panel-divider,

@@ -18,7 +18,7 @@ $panel-margin: 1px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: $panel-padding;
+    padding: 2px $panel-padding;
 
     .mw-panel-title {
       flex: 1;
@@ -69,24 +69,35 @@ $panel-margin: 1px;
   }
 }
 
-@mixin panel($background, $foreground, $border) {
+@mixin panel($background, $foreground, $header, $border) {
   .mw-panel {
     color: $foreground;
-    background: $background;
 
     &.mw-panel-transparent {
       background: transparent;
     }
 
-    &.mw-panel-bordered {
+    &.content {
       border: 1px solid $border;
+      background: $background;
+    }
+
+    border: 1px solid $border;
+
+    .mw-panel-header {
+      border-bottom: 1px solid $border;
+      background: $header;
+    }
+
+    .mw-panel-content {
+      background: $background;
     }
 
     .mw-panel-header .mw-panel-actions .mw-panel-action-divider {
       display: inline-flex;
       width: 1px;
       align-self: stretch;
-      background-color: color.adjust($foreground, $alpha: -0.75);
+      background-color: $border;
     }
   }
 }

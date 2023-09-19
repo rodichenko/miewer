@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 .miewer {
   pointer-events: none;
   position: absolute;
@@ -9,23 +11,12 @@
     border-bottom: 1px solid transparent;
     padding: 2px 10px;
     pointer-events: auto;
+    z-index: 3;
 
     .mw-miewer-header-toggle {
       display: inline-flex;
       align-items: center;
       line-height: 1;
-    }
-  }
-}
-
-@mixin miewer($bg, $fg, $header, $header-shadow) {
-  .miewer {
-    background: $bg;
-    color: $fg;
-
-    .mw-miewer-header {
-      background-color: $header;
-      box-shadow: 0 0 2px 2px $header-shadow;
     }
   }
 }
@@ -42,5 +33,17 @@
 
   > *:not(:last-child) {
     margin-right: 5px;
+  }
+}
+
+@mixin miewer($bg, $fg, $header, $header-border) {
+  .miewer {
+    background: $bg;
+    color: $fg;
+
+    .mw-miewer-header {
+      background: $header;
+      border-bottom: 1px solid $header-border;
+    }
   }
 }

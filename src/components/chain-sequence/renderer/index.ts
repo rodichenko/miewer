@@ -567,8 +567,10 @@ class ChainRenderer {
   private getItemsWithinRange(from: number, to: number): Residue[] {
     const { chain } = this;
     if (chain) {
-      const start = Math.floor(Math.min(from, to));
-      const end = Math.ceil(Math.max(from, to));
+      const correct = (position: number): number =>
+        Math.max(0, Math.min(chain.sequence.length + 1, position));
+      const start = correct(Math.floor(Math.min(from, to)));
+      const end = correct(Math.ceil(Math.max(from, to)));
       return chain.sequence
         .slice(start, end + (start === end ? 1 : 0))
         .map((item) => item.residue);
@@ -639,7 +641,7 @@ class ChainRenderer {
       const hash = [
         ...new Set(session.lastSelection.map((item) => item._index)),
       ].sort((a, b) => a - b);
-      const newHash = [...new Set(items.map((item) => item._index))].sort(
+      const newHash = [...new Set(selected.map((item) => item._index))].sort(
         (a, b) => a - b,
       );
       if (!arraysEquals(hash, newHash)) {
@@ -741,7 +743,7 @@ class ChainRenderer {
       this.requestRender();
     }
     if (!this.pointerEventsDisabled && this._selectionSession !== undefined) {
-      this.mouseMove(event);
+      this.handleSelectionEvent(event);
       this.reportPointerEvent(ChainSequenceEvent.selectionFinish);
       this.requestRender();
     }

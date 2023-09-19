@@ -1,4 +1,8 @@
 .chain-sequences {
+  overflow: auto;
+  max-height: 200px;
+  height: auto;
+
   .chain-sequence-block {
     margin-top: 5px;
   }

@@ -8,7 +8,7 @@ import type {
 import { arraysShallowEquals } from '../helpers/rest';
 import { getSelectorFromSelectedResidues } from '../helpers/miew/selection';
 
-export const useMiewSelectionStore = create<MiewSelectionStore>((set) => ({
+export const useMiewSelectionStore = create<MiewSelectionStore>((set, get) => ({
   lastPick: undefined,
   selectedAtomsCount: 0,
   selectedResidues: [],
@@ -19,11 +19,17 @@ export const useMiewSelectionStore = create<MiewSelectionStore>((set) => ({
   setSelectedAtomsCount(count: number): void {
     set(() => ({ selectedAtomsCount: count }));
   },
+  getSelectedResidues(): Residue[] {
+    return get().selectedResidues;
+  },
   setSelectedResidues(residues: Residue[]): void {
     set(() => ({
       selectedResidues: residues.slice(),
       selector: getSelectorFromSelectedResidues(residues),
     }));
+  },
+  getSelector(): string {
+    return get().selector;
   },
   setData(data: MiewSelectionData): void {
     set((current) => {

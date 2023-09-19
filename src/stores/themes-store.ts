@@ -93,7 +93,7 @@ export function useThemeConfig(): PredefinedTheme {
   return useThemesStore((store) => store.themeConfig);
 }
 
-function dropDownDarkAlgorithm(seedToken: SeedToken): MapToken {
+function customDarkAlgorithm(seedToken: SeedToken): MapToken {
   const mapToken = antdTheme.darkAlgorithm(seedToken);
   mapToken.colorPrimary = mapToken.colorText;
   mapToken.colorPrimaryBg = mapToken.colorFillTertiary;
@@ -111,6 +111,8 @@ export function useAntdThemes(): ThemeConfig {
       token: {
         borderRadiusOuter: 0,
         borderRadius: 0,
+        colorBgBase: colorValueToString(themeConfig.baseBackground),
+        colorTextBase: colorValueToString(themeConfig.foreground),
         colorError: colorValueToString(themeConfig.error),
         fontFamily: themeConfig.fontFamily,
         fontSize: themeConfig.fontSize,
@@ -119,13 +121,13 @@ export function useAntdThemes(): ThemeConfig {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Dropdown: {
           algorithm: themeConfig.dark
-            ? [dropDownDarkAlgorithm]
+            ? [customDarkAlgorithm]
             : [antdTheme.defaultAlgorithm],
         },
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Select: {
           algorithm: themeConfig.dark
-            ? [dropDownDarkAlgorithm]
+            ? [customDarkAlgorithm]
             : [antdTheme.defaultAlgorithm],
         },
       },

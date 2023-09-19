@@ -6,6 +6,7 @@ export type Theme = {
 };
 
 export type PredefinedTheme = Theme & {
+  readonly baseBackground: MiewerColor;
   readonly background: MiewerColor;
   readonly foreground: MiewerColor;
   readonly error: MiewerColor;

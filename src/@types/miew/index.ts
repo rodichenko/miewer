@@ -303,7 +303,9 @@ export type MiewSelectionData = {
 export type MiewSelectionActions = {
   setLastPick(entity: MiewEntity | undefined): void;
   setSelectedAtomsCount(count: number): void;
+  getSelectedResidues(): Residue[];
   setSelectedResidues(residues: Residue[]): void;
+  getSelector(): string;
   setData(data: Partial<MiewSelectionData>): void;
 };
 

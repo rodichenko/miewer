@@ -8,8 +8,9 @@ import { useChainSequencesConfig } from '../../stores/chain-sequences-config-sto
 import { ChainSequenceRenderType } from '../../@types/components/chain-sequences';
 
 export default function useChainSequencesActions(): PanelRootAction[] {
-  const { selector, selectedResidues, setSelectedResidues } =
+  const { getSelector, getSelectedResidues, setSelectedResidues } =
     useMiewSelectionStore();
+  const hasSelection = getSelectedResidues().length > 0;
   const { setUseColorer, setRenderType, renderType, useColorer } =
     useChainSequencesConfig();
   const createRepresentation = useCreateMiewRepresentation();
@@ -17,6 +18,7 @@ export default function useChainSequencesActions(): PanelRootAction[] {
     setSelectedResidues([]);
   }, [setSelectedResidues]);
   const createLayerFromSelection = useCallback(() => {
+    const selector = getSelector();
     if (selector) {
       createRepresentation({
         selector,
@@ -29,7 +31,7 @@ export default function useChainSequencesActions(): PanelRootAction[] {
       });
       clearSelection();
     }
-  }, [selector, createRepresentation, clearSelection]);
+  }, [getSelector, createRepresentation, clearSelection]);
   return useMemo<PanelRootAction[]>(() => {
     const actions: PanelRootAction[] = [];
     actions.push({
@@ -68,13 +70,13 @@ export default function useChainSequencesActions(): PanelRootAction[] {
     actions.push({
       key: 'selection',
       title: 'Selection',
-      disabled: selectedResidues.length === 0,
+      disabled: !hasSelection,
       actions: [
         {
           key: 'add-layer-from-selection',
           title: 'Add layer from selection',
           onAction: createLayerFromSelection,
-          disabled: selectedResidues.length === 0,
+          disabled: !hasSelection,
         },
         {
           type: 'divider',
@@ -83,13 +85,13 @@ export default function useChainSequencesActions(): PanelRootAction[] {
           key: 'clear-selection',
           title: 'Clear',
           onAction: clearSelection,
-          disabled: selectedResidues.length === 0,
+          disabled: !hasSelection,
         },
       ],
     });
     return actions;
   }, [
-    selectedResidues,
+    hasSelection,
     createLayerFromSelection,
     clearSelection,
     useColorer,

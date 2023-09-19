@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { CommonLayoutProps } from '../../@types/components/layout';
 import ChainSequences from './index';
 import { MiewerPanel } from '../layout';
