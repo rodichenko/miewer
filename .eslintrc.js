@@ -31,7 +31,13 @@ module.exports = {
     'no-console': 'off',
   },
   root: true,
-  ignorePatterns: ['misc/**/*', '.*rc.json', '.*rc.js', '*.config.js'],
+  ignorePatterns: [
+    'misc/**/*',
+    '.*rc.json',
+    '.*rc.js',
+    '*.config.js',
+    'build-stats/**/*',
+  ],
   overrides: [
     {
       files: ['src/**/*.test.{js,jsx,ts,tsx}'],

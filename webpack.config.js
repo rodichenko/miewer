@@ -2,9 +2,45 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { Config, pretty } = require('./misc/console');
 const packageJson = require('./package.json');
 require('dotenv').config();
+
+function escapeRegExp(string) {
+  const characters = ['-', '.', '/', '\\', '~'];
+  let result = string;
+  characters.forEach((character) => {
+    result = result.replace(
+      new RegExp('\\' + character, 'g'),
+      `\\${character}`,
+    );
+  });
+  return result;
+}
+
+/**
+ * @param {string} groups
+ * @returns {{[group: string]: {name: string, test: RegExp, chunks: string}}}
+ */
+function createCacheGroups(...groups) {
+  return groups
+    .map((group) => ({
+      [group]: {
+        name: group,
+        test: new RegExp(`[/\\\\]node_modules[/\\\\](${escapeRegExp(group)})`),
+        chunks: 'all',
+      },
+    }))
+    .concat({
+      vendors: {
+        name: 'vendors',
+        test: new RegExp(
+          `[/\\\\]node_modules[/\\\\](?!${groups.map(escapeRegExp).join('|')})`,
+        ),
+        chunks: 'all',
+      },
+    })
+    .reduce((r, c) => ({ ...r, ...c }), {});
+}
 
 module.exports = function (env, args) {
   const mode = args.mode || 'production';
@@ -13,27 +49,16 @@ module.exports = function (env, args) {
   const development = !production;
   const publicPath = process.env.PUBLIC_PATH || '/';
   const title = process.env.MIEWER_TITLE || 'Miewer';
-  console.log('Building', pretty('Miewer', Config.FgGreen, Config.Bright), ':');
-  console.log('');
-  console.log('Mode:       ', pretty(mode, Config.FgGreen));
-  console.log('Title:      ', pretty(title, Config.FgGreen));
-  console.log('Public path:', pretty(publicPath, Config.FgGreen));
-  console.log('');
   return {
     mode: development ? 'development' : 'production',
     entry: {
-      main: {
-        import: path.resolve(__dirname, './src/index.tsx'),
-        dependOn: 'miew',
-      },
-      jquery: 'jquery',
-      miew: 'miew',
+      miewer: path.resolve(__dirname, './src/index.tsx'),
     },
     output: {
-      publicPath: '/',
-      path: path.resolve('./build'),
+      publicPath,
+      path: path.resolve(args.profile ? './build-stats' : './build'),
       filename: 'js/[name].[contenthash].js',
-      clean: true,
+      clean: !args.profile,
       assetModuleFilename: 'static/[name].[ext][query]',
     },
     devtool: production ? 'source-map' : 'inline-source-map',
@@ -100,6 +125,19 @@ module.exports = function (env, args) {
     optimization: {
       minimize: production,
       chunkIds: 'deterministic',
+      runtimeChunk: {
+        name: (entrypoint) => `${entrypoint.name}~runtime`,
+      },
+      splitChunks: {
+        cacheGroups: createCacheGroups(
+          'miew',
+          'lodash',
+          'react',
+          'antd',
+          '@antd',
+          'three',
+        ),
+      },
     },
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],

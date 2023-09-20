@@ -6,6 +6,7 @@
   "repository": "https://github.com/rodichenko/miewer",
   "scripts": {
     "build": "webpack --mode=production",
+    "build:analyze": "webpack --profile --json=./build-stats/stats.json && webpack-bundle-analyzer ./build-stats/stats.json -m static -r ./build-stats/stats.html",
     "development": "webpack serve --mode=development",
     "test": "jest",
     "lint": "eslint \"./src/**/*.{js,jsx,ts,tsx}\"",
@@ -57,6 +58,7 @@
     "ts-loader": "^9.4.4",
     "typescript": "^5.2.2",
     "webpack": "^5.88.2",
+    "webpack-bundle-analyzer": "^4.9.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
   },
