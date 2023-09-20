@@ -20,13 +20,13 @@ function MiewSelectionInfo(props: BasicComponentProps) {
   const { className, style } = props;
   const { lastPick, selectedAtomsCount: count } = useMiewSelectionStore();
   const lastPickDescription = useMemo<string | undefined>(() => {
-    if (!lastPick && count === 0) {
+    if (!lastPick) {
       return undefined;
     }
-    if (!lastPick) {
-      return `${count} atom${count === 1 ? '' : 's'} selected`;
-    }
-    const base = `${count} atom${count === 1 ? '' : 's'} selected, last pick:`;
+    const base =
+      count > 0
+        ? `${count} atom${count === 1 ? '' : 's'} selected, last pick:`
+        : 'Last pick:';
     const info = [];
     if (isMiewAtom(lastPick)) {
       info.push(

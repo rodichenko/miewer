@@ -35,7 +35,9 @@ class MiewProxy {
         rest,
       );
       this._options = rest;
-      this._processor.registerRequest(new MiewOptionsRequest(diff));
+      this._processor.registerRequest(
+        new MiewOptionsRequest({ ...diff, reps: rest.reps }),
+      );
     }
   }
 
