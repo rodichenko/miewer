@@ -148,7 +148,9 @@ const config = {
   testEnvironment: 'jsdom',
 
   // Options that will be passed to the testEnvironment
-  // testEnvironmentOptions: {},
+  testEnvironmentOptions: {
+    url: 'https://miewer.com/',
+  },
 
   // Adds a location field to test results
   // testLocationInResults: false,

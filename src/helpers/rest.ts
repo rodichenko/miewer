@@ -4,36 +4,23 @@ export function noop(): any {
   // Noop
 }
 
-export function asArray<T>(data: T | T[]): T[] {
-  if (data !== undefined && Array.isArray(data)) {
-    return data;
-  }
-  if (data !== undefined) {
-    return [data];
-  }
-  return [];
-}
-
-export function asPlain<T>(data: T | T[]): T | undefined {
-  if (data !== undefined && Array.isArray(data)) {
-    return data[0];
-  }
-  if (data !== undefined) {
-    return data;
-  }
-  return undefined;
-}
-
-export function getGreatestCommonDivisorEuclideanAlgorithm(
+function getGreatestCommonDivisorEuclideanAlgorithm(
   a: number,
   b: number,
 ): number {
   // We're only processing integer numbers
-  const t1 = Math.floor(a);
-  const t2 = Math.floor(b);
-  if (t1 <= 0 || t2 <= 0) {
+  let t1 = Math.floor(a);
+  let t2 = Math.floor(b);
+  if (t1 !== a || t2 !== b) {
+    // We're only processing integer numbers
     return 1;
   }
+  if (t1 === 0 || t2 === 0) {
+    return 1;
+  }
+  // We're only processing positive numbers
+  t1 = Math.abs(t1);
+  t2 = Math.abs(t2);
   // Euclidean algorithm, division-based version
   let min = Math.min(t1, t2);
   let max = Math.max(t1, t2);
@@ -45,14 +32,15 @@ export function getGreatestCommonDivisorEuclideanAlgorithm(
   return max;
 }
 
-export function getGreatestCommonDivisor(...number: number[]): number {
-  if (number.length === 0) {
+export function getGreatestCommonDivisor(...numbers: number[]): number | never {
+  const unique = [...new Set(numbers)];
+  if (unique.length === 0) {
     return 1;
   }
-  if (number.length === 1) {
-    return number[0];
+  if (unique.length === 1) {
+    return getGreatestCommonDivisorEuclideanAlgorithm(unique[0], unique[0]);
   }
-  const [a, b, ...rest] = number;
+  const [a, b, ...rest] = unique;
   return getGreatestCommonDivisor(
     getGreatestCommonDivisorEuclideanAlgorithm(a, b),
     ...rest,
@@ -139,7 +127,7 @@ export function objectsEquals<T, U>(original: T, comparing: U): boolean {
     }
     return true;
   }
-  return (original as any) !== (comparing as any);
+  return (original as any) === (comparing as any);
 }
 
 export function getQueryStringEntries(search?: string): QueryStringEntry[] {
@@ -150,6 +138,7 @@ export function getQueryStringEntries(search?: string): QueryStringEntry[] {
     : queryString;
   return query
     .split('&')
+    .filter((s) => s.length > 0)
     .map((entryString) => entryString.split('='))
     .map(([key, ...value]) => ({
       key: decodeURIComponent(key),
@@ -159,10 +148,9 @@ export function getQueryStringEntries(search?: string): QueryStringEntry[] {
 
 function getQueryEntryString(
   entry: QueryStringEntry,
-  encodeKey: boolean,
   encodeValue: boolean,
 ): string {
-  const key = encodeKey ? encodeURIComponent(entry.key) : entry.key;
+  const key = encodeURIComponent(entry.key);
   const value = encodeValue ? encodeURIComponent(entry.value) : entry.value;
   return `${key}=${value}`;
 }
@@ -185,7 +173,6 @@ export function getQueryStringFromEntries(
     .map((entry) =>
       getQueryEntryString(
         entry,
-        false,
         encodeKeys.some((encodeKey) => entryMatchesEncodeKey(entry, encodeKey)),
       ),
     )
@@ -193,7 +180,7 @@ export function getQueryStringFromEntries(
   return query.length > 0 ? `?${query}` : '';
 }
 
-const escapeRegExpCharacters = [
+export const escapeRegExpCharacters = [
   '.',
   '-',
   '+',
@@ -240,7 +227,7 @@ export function getRangesFromNumberArray(
   return result;
 }
 
-export function getCssNumberValueRegExp(...unit: string[]): RegExp {
+function getCssNumberValueRegExp(...unit: string[]): RegExp {
   return new RegExp(
     `^(\\d+(\\.\\d+)?)(${unit.map((u) => escapeRegExp(u)).join('|')})?$`,
     'i',
